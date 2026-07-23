@@ -63,52 +63,76 @@
     <div style="flex:1;overflow-y:auto;padding:24px 32px 90px;">
 
       <sc-if value="{{ isDash }}" hint-placeholder-val="{{ true }}">
-        <div style="max-width:1020px;margin:0 auto;">
-          <div style="text-align:center;padding:30px 0 0;">
-            <div style="font-size:12.5px;font-weight:600;color:#9AA1AC;">{{ datumLabel }}</div>
-            <h2 style="margin:10px 0 0;font-size:34px;font-weight:800;letter-spacing:-.025em;color:#0A1B33;">{{ greeting }}</h2>
-            <div style="font-size:14px;color:#67707E;margin-top:10px;">{{ totaal }} financiers · {{ ppCount }} preferred partners · {{ openCases }} casussen in behandeling</div>
-          </div>
+        <div style="max-width:1280px;margin:0 auto;">
 
-          <div onClick="{{ openCaseModal }}" style="position:relative;overflow:hidden;margin:30px auto 0;max-width:780px;background:#0A1B33;border-radius:20px;padding:10px 10px 4px;cursor:pointer;box-shadow:0 18px 44px rgba(10,27,51,.16);" style-hover="box-shadow:0 24px 56px rgba(10,27,51,.26);">
-            <div style="position:absolute;inset:0;background:radial-gradient(ellipse 70% 130% at 92% -25%,rgba(33,84,244,.38),transparent 62%);pointer-events:none;"></div>
-            <div style="position:relative;display:flex;align-items:center;gap:14px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:14px;padding:14px 14px 14px 18px;">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#5B85F8" stroke-width="2" style="flex:none;"><path d="M12 3l1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9z"></path><path d="M19 15l.9 2.1L22 18l-2.1.9L19 21l-.9-2.1L16 18l2.1-.9z"></path></svg>
-              <span style="font-size:14.5px;color:#8FA0B8;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">Beschrijf de klantcasus of upload het dossier…</span>
-              <span style="margin-left:auto;flex:none;display:flex;align-items:center;gap:8px;background:#2154F4;color:#fff;font-size:13.5px;font-weight:700;border-radius:10px;padding:11px 20px;">Start casus<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14m0 0l-6-6m6 6l-6 6"></path></svg></span>
-            </div>
-            <div style="position:relative;display:flex;align-items:center;justify-content:center;gap:16px;padding:10px 16px;font-size:11.5px;color:#5F7392;flex-wrap:wrap;">
-              <span>AI beoordeelt alle {{ totaal }} financiers</span><span style="color:#2c4266;">·</span><span>rapport met shortlist &amp; dealstructuur</span><span style="color:#2c4266;">·</span><span>PDF of Word direct uploaden</span>
-            </div>
-          </div>
-
-          <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:34px;">
-            <div onClick="{{ goList }}" style="background:#fff;border:1px solid #E4E2D8;border-radius:16px;padding:18px;cursor:pointer;display:flex;flex-direction:column;gap:12px;" style-hover="border-color:#2154F4;box-shadow:0 8px 22px rgba(33,84,244,.1);">
-              <span style="width:36px;height:36px;border-radius:10px;background:#E9EFFE;display:flex;align-items:center;justify-content:center;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#2154F4" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h10"></path></svg></span>
-              <span><span style="display:block;font-size:14px;font-weight:800;color:#0A1B33;">Database</span><span style="display:block;font-size:12px;color:#9AA1AC;margin-top:2px;">{{ totaal }} financiers</span></span>
-            </div>
-            <div onClick="{{ goMatch }}" style="background:#fff;border:1px solid #E4E2D8;border-radius:16px;padding:18px;cursor:pointer;display:flex;flex-direction:column;gap:12px;" style-hover="border-color:#2154F4;box-shadow:0 8px 22px rgba(33,84,244,.1);">
-              <span style="width:36px;height:36px;border-radius:10px;background:#E9EFFE;display:flex;align-items:center;justify-content:center;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#2154F4" stroke-width="2"><circle cx="11" cy="11" r="7"></circle><path d="M21 21l-4.3-4.3"></path></svg></span>
-              <span><span style="display:block;font-size:14px;font-weight:800;color:#0A1B33;">Matching</span><span style="display:block;font-size:12px;color:#9AA1AC;margin-top:2px;">snelle shortlist</span></span>
-            </div>
-            <div onClick="{{ goCompare }}" style="background:#fff;border:1px solid #E4E2D8;border-radius:16px;padding:18px;cursor:pointer;display:flex;flex-direction:column;gap:12px;" style-hover="border-color:#2154F4;box-shadow:0 8px 22px rgba(33,84,244,.1);">
-              <span style="width:36px;height:36px;border-radius:10px;background:#E9EFFE;display:flex;align-items:center;justify-content:center;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#2154F4" stroke-width="2"><path d="M9 3v18M15 3v18M3 9h18M3 15h18"></path></svg></span>
-              <span><span style="display:block;font-size:14px;font-weight:800;color:#0A1B33;">Vergelijken</span><span style="display:block;font-size:12px;color:#9AA1AC;margin-top:2px;">{{ compareCount }} geselecteerd</span></span>
-            </div>
-            <div onClick="{{ goEnrich }}" style="background:#fff;border:1px solid #E4E2D8;border-radius:16px;padding:18px;cursor:pointer;display:flex;flex-direction:column;gap:12px;" style-hover="border-color:#2154F4;box-shadow:0 8px 22px rgba(33,84,244,.1);">
-              <span style="width:36px;height:36px;border-radius:10px;background:#E9EFFE;display:flex;align-items:center;justify-content:center;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#2154F4" stroke-width="2"><path d="M12 3l1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9z"></path><path d="M19 15l.9 2.1L22 18l-2.1.9L19 21l-.9-2.1L16 18l2.1-.9z"></path></svg></span>
-              <span><span style="display:block;font-size:14px;font-weight:800;color:#0A1B33;">AI-verrijking</span><span style="display:block;font-size:12px;color:#9AA1AC;margin-top:2px;">{{ enrichCount }} voorstellen</span></span>
+          <div style="position:relative;overflow:hidden;background:#0A1B33;border-radius:24px;padding:46px 52px 34px;color:#fff;box-shadow:0 24px 60px rgba(10,27,51,.18);">
+            <div style="position:absolute;inset:0;background:radial-gradient(ellipse 60% 130% at 88% -20%,rgba(33,84,244,.5),transparent 58%),radial-gradient(ellipse 45% 90% at 4% 118%,rgba(33,84,244,.24),transparent 62%);pointer-events:none;"></div>
+            <div style="position:relative;max-width:880px;margin:0 auto;text-align:center;">
+              <div style="font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#5B85F8;">{{ datumLabel }}</div>
+              <h2 style="margin:12px 0 0;font-size:40px;font-weight:800;letter-spacing:-.03em;">{{ greeting }}</h2>
+              <div style="font-size:14.5px;color:#8FA0B8;margin-top:10px;">Het financiersnetwerk van Credion — van klantvraag naar onderbouwde shortlist in minuten.</div>
+              <div onClick="{{ openCaseModal }}" style="display:flex;align-items:center;gap:14px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.14);border-radius:16px;padding:13px 13px 13px 20px;margin-top:28px;cursor:pointer;text-align:left;" style-hover="border-color:rgba(91,133,248,.65);background:rgba(255,255,255,.11);">
+                <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#5B85F8" stroke-width="2" style="flex:none;"><path d="M12 3l1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9z"></path><path d="M19 15l.9 2.1L22 18l-2.1.9L19 21l-.9-2.1L16 18l2.1-.9z"></path></svg>
+                <span style="font-size:15px;color:#8FA0B8;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">Beschrijf de klantcasus of upload het dossier…</span>
+                <span style="margin-left:auto;flex:none;display:flex;align-items:center;gap:8px;background:#2154F4;color:#fff;font-size:14px;font-weight:700;border-radius:11px;padding:12px 22px;">Start casus<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14m0 0l-6-6m6 6l-6 6"></path></svg></span>
+              </div>
+              <div style="display:flex;align-items:center;justify-content:center;gap:18px;margin-top:16px;font-size:12px;color:#5F7392;flex-wrap:wrap;">
+                <span style="display:flex;align-items:center;gap:6px;"><span style="width:5px;height:5px;border-radius:99px;background:#5B85F8;"></span>pre-filter + AI beoordeelt de kansrijkste financiers</span>
+                <span style="display:flex;align-items:center;gap:6px;"><span style="width:5px;height:5px;border-radius:99px;background:#5B85F8;"></span>rapport met shortlist &amp; dealstructuur</span>
+                <span style="display:flex;align-items:center;gap:6px;"><span style="width:5px;height:5px;border-radius:99px;background:#5B85F8;"></span>PDF of Word direct uploaden</span>
+              </div>
             </div>
           </div>
 
-        <div style="margin-top:28px;">
+          <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:16px;">
+            <div onClick="{{ goList }}" style="background:#fff;border:1px solid #E4E2D8;border-radius:18px;padding:22px 24px;cursor:pointer;" style-hover="border-color:#2154F4;box-shadow:0 10px 28px rgba(33,84,244,.12);">
+              <div style="display:flex;align-items:center;gap:8px;font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#67707E;"><span style="width:8px;height:8px;border-radius:3px;background:#2154F4;"></span>Financiers</div>
+              <div style="font-size:34px;font-weight:800;letter-spacing:-.02em;color:#0A1B33;margin-top:10px;font-variant-numeric:tabular-nums;">{{ totaal }}</div>
+              <div style="font-size:12.5px;color:#9AA1AC;margin-top:3px;">volledige database met filters</div>
+            </div>
+            <div onClick="{{ goCases }}" style="background:#fff;border:1px solid #E4E2D8;border-radius:18px;padding:22px 24px;cursor:pointer;" style-hover="border-color:#2154F4;box-shadow:0 10px 28px rgba(33,84,244,.12);">
+              <div style="display:flex;align-items:center;gap:8px;font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#67707E;"><span style="width:8px;height:8px;border-radius:3px;background:#0E7A4C;"></span>In behandeling</div>
+              <div style="font-size:34px;font-weight:800;letter-spacing:-.02em;color:#0A1B33;margin-top:10px;font-variant-numeric:tabular-nums;">{{ openCases }}</div>
+              <div style="font-size:12.5px;color:#9AA1AC;margin-top:3px;">casussen van intake tot deal</div>
+            </div>
+            <div onClick="{{ goList }}" style="background:#fff;border:1px solid #E4E2D8;border-radius:18px;padding:22px 24px;cursor:pointer;" style-hover="border-color:#2154F4;box-shadow:0 10px 28px rgba(33,84,244,.12);">
+              <div style="display:flex;align-items:center;gap:8px;font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#67707E;"><span style="width:8px;height:8px;border-radius:3px;background:#B45309;"></span>Preferred partners</div>
+              <div style="font-size:34px;font-weight:800;letter-spacing:-.02em;color:#0A1B33;margin-top:10px;font-variant-numeric:tabular-nums;">{{ ppCount }}</div>
+              <div style="font-size:12.5px;color:#9AA1AC;margin-top:3px;">voorkeursfinanciers van Credion</div>
+            </div>
+            <div onClick="{{ goEnrich }}" style="background:#fff;border:1px solid #E4E2D8;border-radius:18px;padding:22px 24px;cursor:pointer;" style-hover="border-color:#2154F4;box-shadow:0 10px 28px rgba(33,84,244,.12);">
+              <div style="display:flex;align-items:center;gap:8px;font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#67707E;"><span style="width:8px;height:8px;border-radius:3px;background:#7C3AED;"></span>Profieldata op orde</div>
+              <div style="font-size:34px;font-weight:800;letter-spacing:-.02em;color:#0A1B33;margin-top:10px;font-variant-numeric:tabular-nums;">{{ pctData }}</div>
+              <div style="font-size:12.5px;color:#9AA1AC;margin-top:3px;">verrijk &amp; valideer profielen</div>
+            </div>
+          </div>
+
+          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:14px;">
+            <div onClick="{{ goMatch }}" style="display:flex;align-items:center;gap:14px;background:#fff;border:1px solid #E4E2D8;border-radius:16px;padding:16px 20px;cursor:pointer;" style-hover="border-color:#2154F4;box-shadow:0 8px 22px rgba(33,84,244,.1);">
+              <span style="width:40px;height:40px;flex:none;border-radius:12px;background:#E9EFFE;display:flex;align-items:center;justify-content:center;"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#2154F4" stroke-width="2"><circle cx="11" cy="11" r="7"></circle><path d="M21 21l-4.3-4.3"></path></svg></span>
+              <span style="min-width:0;"><span style="display:block;font-size:14px;font-weight:800;color:#0A1B33;">Matching</span><span style="display:block;font-size:12px;color:#9AA1AC;margin-top:1px;">snelle shortlist op profiel &amp; track record</span></span>
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#C2C4BD" stroke-width="2.5" style="margin-left:auto;flex:none;"><path d="M9 6l6 6-6 6"></path></svg>
+            </div>
+            <div onClick="{{ goCompare }}" style="display:flex;align-items:center;gap:14px;background:#fff;border:1px solid #E4E2D8;border-radius:16px;padding:16px 20px;cursor:pointer;" style-hover="border-color:#2154F4;box-shadow:0 8px 22px rgba(33,84,244,.1);">
+              <span style="width:40px;height:40px;flex:none;border-radius:12px;background:#E9EFFE;display:flex;align-items:center;justify-content:center;"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#2154F4" stroke-width="2"><path d="M9 3v18M15 3v18M3 9h18M3 15h18"></path></svg></span>
+              <span style="min-width:0;"><span style="display:block;font-size:14px;font-weight:800;color:#0A1B33;">Vergelijken</span><span style="display:block;font-size:12px;color:#9AA1AC;margin-top:1px;">{{ compareCount }} geselecteerd — zet ze naast elkaar</span></span>
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#C2C4BD" stroke-width="2.5" style="margin-left:auto;flex:none;"><path d="M9 6l6 6-6 6"></path></svg>
+            </div>
+            <div onClick="{{ goEnrich }}" style="display:flex;align-items:center;gap:14px;background:#fff;border:1px solid #E4E2D8;border-radius:16px;padding:16px 20px;cursor:pointer;" style-hover="border-color:#2154F4;box-shadow:0 8px 22px rgba(33,84,244,.1);">
+              <span style="width:40px;height:40px;flex:none;border-radius:12px;background:#E9EFFE;display:flex;align-items:center;justify-content:center;"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#2154F4" stroke-width="2"><path d="M12 3l1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9z"></path><path d="M19 15l.9 2.1L22 18l-2.1.9L19 21l-.9-2.1L16 18l2.1-.9z"></path></svg></span>
+              <span style="min-width:0;"><span style="display:block;font-size:14px;font-weight:800;color:#0A1B33;">AI-verrijking</span><span style="display:block;font-size:12px;color:#9AA1AC;margin-top:1px;">{{ enrichCount }} voorstellen — webverificatie &amp; documenten</span></span>
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#C2C4BD" stroke-width="2.5" style="margin-left:auto;flex:none;"><path d="M9 6l6 6-6 6"></path></svg>
+            </div>
+          </div>
+
+        <div style="margin-top:30px;">
           <div style="display:flex;align-items:baseline;gap:10px;">
             <h2 style="margin:0;font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#9AA1AC;">Snelfilters</h2>
             <span style="font-size:12px;color:#9AA1AC;">klik om de database gefilterd te openen</span>
           </div>
           <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:12px;">
             <sc-for list="{{ quickChips }}" as="chip" hint-placeholder-count="9">
-              <button onClick="{{ chip.go }}" style="display:flex;align-items:center;gap:8px;border:1px solid #E4E2D8;background:#fff;border-radius:99px;padding:8px 15px;font-size:13px;font-weight:600;color:#14202E;cursor:pointer;box-shadow:0 1px 2px rgba(10,27,51,.04);" style-hover="border-color:#2154F4;color:#2154F4;box-shadow:0 3px 10px rgba(33,84,244,.12);">
+              <button onClick="{{ chip.go }}" style="display:flex;align-items:center;gap:8px;border:1px solid #E4E2D8;background:#fff;border-radius:99px;padding:9px 16px;font-size:13px;font-weight:600;color:#14202E;cursor:pointer;box-shadow:0 1px 2px rgba(10,27,51,.04);" style-hover="border-color:#2154F4;color:#2154F4;box-shadow:0 3px 10px rgba(33,84,244,.12);">
                 {{ chip.label }}
                 <span style="font-size:11.5px;font-weight:700;color:#2154F4;background:#E9EFFE;border-radius:99px;padding:1px 8px;font-variant-numeric:tabular-nums;">{{ chip.count }}</span>
               </button>
@@ -116,7 +140,7 @@
           </div>
         </div>
 
-        <div style="display:grid;grid-template-columns:1.15fr .85fr;gap:16px;margin-top:28px;align-items:stretch;">
+        <div style="display:grid;grid-template-columns:1.1fr .8fr .85fr;gap:16px;margin-top:26px;align-items:stretch;">
           <div style="background:#fff;border:1px solid #E4E2D8;border-radius:16px;padding:20px 22px;display:flex;flex-direction:column;">
             <div style="display:flex;align-items:center;gap:8px;">
               <h2 style="margin:0;font-size:15px;font-weight:700;color:#0A1B33;">Recente casussen</h2>
@@ -124,7 +148,8 @@
             </div>
             <sc-if value="{{ casesEmpty }}" hint-placeholder-val="{{ false }}">
               <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:26px 20px;">
-                <div style="font-size:13px;font-weight:700;color:#0A1B33;">Nog geen casussen</div>
+                <div style="width:40px;height:40px;border-radius:12px;background:#E9EFFE;display:flex;align-items:center;justify-content:center;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2154F4" stroke-width="2"><path d="M14 3H7a2 2 0 00-2 2v14a2 2 0 002 2h10a2 2 0 002-2V8z"></path><path d="M14 3v5h5M9 13h6M9 17h4"></path></svg></div>
+                <div style="font-size:13px;font-weight:700;color:#0A1B33;margin-top:10px;">Nog geen casussen</div>
                 <div style="font-size:12px;color:#9AA1AC;margin-top:5px;line-height:1.55;max-width:280px;">Start hierboven een casus — de AI zoekt kansrijke financiers en schrijft het rapport.</div>
               </div>
             </sc-if>
@@ -137,6 +162,17 @@
                   </span>
                   <span style="margin-left:auto;flex:none;display:flex;align-items:center;gap:5px;font-size:11px;font-weight:600;color:{{ rc.repFg }};"><span style="width:6px;height:6px;border-radius:99px;background:{{ rc.repFg }};"></span>{{ rc.repText }}</span>
                   <span style="flex:none;font-size:10.5px;font-weight:700;color:{{ rc.stFg }};background:{{ rc.stBg }};border-radius:99px;padding:3px 9px;">{{ rc.status }}</span>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+          <div style="background:#fff;border:1px solid #E4E2D8;border-radius:16px;padding:20px 22px;">
+            <h2 style="margin:0;font-size:15px;font-weight:700;color:#0A1B33;">Netwerk per type</h2>
+            <div style="display:flex;flex-direction:column;gap:10px;margin-top:14px;">
+              <sc-for list="{{ typeStats }}" as="t" hint-placeholder-count="6">
+                <div onClick="{{ t.go }}" style="cursor:pointer;" style-hover="opacity:.7;">
+                  <div style="display:flex;font-size:12px;color:#48505C;font-weight:600;">{{ t.label }}<b style="margin-left:auto;color:#0A1B33;font-variant-numeric:tabular-nums;">{{ t.count }}</b></div>
+                  <div style="height:6px;background:#EFEEE8;border-radius:99px;margin-top:5px;overflow:hidden;"><div style="height:100%;width:{{ t.pct }}%;background:#2154F4;border-radius:99px;"></div></div>
                 </div>
               </sc-for>
             </div>
@@ -169,7 +205,7 @@
                 <div style="display:flex;font-size:12px;color:#B9C4D6;">Gevalideerd<b style="margin-left:auto;color:#fff;font-variant-numeric:tabular-nums;">{{ kpiValid }}</b></div>
                 <div style="display:flex;font-size:12px;color:#B9C4D6;">Preferred partners<b style="margin-left:auto;color:#fff;font-variant-numeric:tabular-nums;">{{ ppCount }}</b></div>
               </div>
-              <button onClick="{{ goEnrich }}" style="margin-top:14px;width:100%;border:none;background:rgba(255,255,255,.1);color:#fff;font-size:12px;font-weight:700;border-radius:9px;padding:9px;cursor:pointer;" style-hover="background:rgba(255,255,255,.18);">Start verrijking</button>
+              <button onClick="{{ goEnrich }}" style="margin-top:14px;width:100%;border:none;background:#2154F4;color:#fff;font-size:12px;font-weight:700;border-radius:9px;padding:9px;cursor:pointer;" style-hover="background:#4A78F7;">Start verrijking</button>
             </div>
           </div>
         </div>
