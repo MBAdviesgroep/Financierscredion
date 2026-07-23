@@ -1,0 +1,1666 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  html,body{margin:0;padding:0;background:#F4F4EF;}
+  body{font-family:'Archivo',ui-sans-serif,system-ui,sans-serif;color:#14202E;-webkit-font-smoothing:antialiased;}
+  a{color:#1060FF;text-decoration:none;}
+  a:hover{color:#0B4EDC;text-decoration:underline;}
+  *{box-sizing:border-box;}
+  input,select,textarea,button{font-family:'Archivo',ui-sans-serif,system-ui,sans-serif;}
+  @keyframes spin{to{transform:rotate(360deg);}}
+</style>
+</helmet>
+<div style="display:flex;flex-direction:column;height:100vh;overflow:hidden;background:#F4F4EF;">
+  <header style="flex:none;display:flex;align-items:center;gap:12px;padding:0 20px;height:60px;background:#0A1B33;min-width:0;">
+    <div onClick="{{ goDash }}" style="display:flex;align-items:center;gap:12px;cursor:pointer;flex:none;">
+      <img src="https://images.weserv.nl/?url=cms.credion.eu/uploads/_AUTOxAUTO_crop_center-center_none/115596/Credion-Logo-Small.webp&amp;w=300" alt="Credion" style="width:92px;display:block;" />
+    </div>
+    <nav style="display:flex;align-items:center;gap:1px;min-width:0;flex:none;white-space:nowrap;">
+      <div onClick="{{ goDash }}" style="padding:8px 10px;border-radius:9px;cursor:pointer;font-size:12.5px;font-weight:600;background:{{ navBg.dashboard }};color:{{ navFg.dashboard }};" style-hover="background:rgba(255,255,255,.08);">Home</div>
+      <div onClick="{{ goCases }}" style="display:flex;align-items:center;gap:7px;padding:8px 10px;border-radius:9px;cursor:pointer;font-size:12.5px;font-weight:600;background:{{ navBg.cases }};color:{{ navFg.cases }};" style-hover="background:rgba(255,255,255,.08);">Casussen<span style="font-size:10.5px;font-weight:700;background:rgba(255,255,255,.14);border-radius:99px;padding:1px 7px;font-variant-numeric:tabular-nums;">{{ casesCount }}</span></div>
+      <div onClick="{{ goList }}" style="padding:8px 10px;border-radius:9px;cursor:pointer;font-size:12.5px;font-weight:600;background:{{ navBg.list }};color:{{ navFg.list }};" style-hover="background:rgba(255,255,255,.08);">Financiers</div>
+      <div onClick="{{ goCompare }}" style="display:flex;align-items:center;gap:7px;padding:8px 10px;border-radius:9px;cursor:pointer;font-size:12.5px;font-weight:600;background:{{ navBg.compare }};color:{{ navFg.compare }};" style-hover="background:rgba(255,255,255,.08);">Vergelijken<span style="font-size:10.5px;font-weight:700;background:rgba(255,255,255,.14);border-radius:99px;padding:1px 7px;font-variant-numeric:tabular-nums;">{{ compareCount }}</span></div>
+      <div onClick="{{ goMatch }}" style="padding:8px 10px;border-radius:9px;cursor:pointer;font-size:12.5px;font-weight:600;background:{{ navBg.match }};color:{{ navFg.match }};" style-hover="background:rgba(255,255,255,.08);">Matching</div>
+      <div onClick="{{ goEnrich }}" style="padding:8px 10px;border-radius:9px;cursor:pointer;font-size:12.5px;font-weight:600;background:{{ navBg.enrich }};color:{{ navFg.enrich }};" style-hover="background:rgba(255,255,255,.08);">AI-verrijking</div>
+    </nav>
+    <div style="margin-left:auto;display:flex;align-items:center;gap:10px;min-width:0;">
+      <div title="{{ apiStatusLabel }} — OpenAI-koppeling voor dataverrijking. Sleutel blijft lokaal in deze browser of staat op de server." style="display:flex;align-items:center;gap:7px;font-size:11.5px;font-weight:600;color:#7C8DA8;min-width:0;white-space:nowrap;"><span style="width:7px;height:7px;border-radius:99px;flex:none;background:{{ apiDotColor }};"></span><span style="min-width:0;overflow:hidden;text-overflow:ellipsis;">{{ apiStatusLabel }}</span></div>
+      <div style="display:flex;gap:6px;">
+        <button onClick="{{ exportBackup }}" title="Back-up downloaden (JSON)" style="display:flex;align-items:center;justify-content:center;width:32px;height:32px;border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.05);color:#B9C4D6;border-radius:9px;cursor:pointer;" style-hover="background:rgba(255,255,255,.12);color:#fff;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v12m0 0l-4-4m4 4l4-4M4 21h16"></path></svg></button>
+        <label title="Back-up herstellen" style="display:flex;align-items:center;justify-content:center;width:32px;height:32px;border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.05);color:#B9C4D6;border-radius:9px;cursor:pointer;" style-hover="background:rgba(255,255,255,.12);color:#fff;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21V9m0 0l-4 4m4-4l4 4M4 3h16"></path></svg><input type="file" accept=".json" onChange="{{ importBackup }}" style="display:none;" /></label>
+      </div>
+      <button onClick="{{ openCaseModal }}" style="flex:none;white-space:nowrap;display:flex;align-items:center;gap:8px;border:none;background:#1060FF;color:#fff;font-size:13px;font-weight:700;border-radius:10px;padding:9px 16px;cursor:pointer;" style-hover="background:#3b7bff;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"></path></svg>Nieuwe casus</button>
+    </div>
+  </header>
+
+  <main style="flex:1;display:flex;flex-direction:column;min-width:0;overflow:hidden;">
+    <sc-if value="{{ headerOn }}" hint-placeholder-val="{{ false }}">
+      <div style="flex:none;display:flex;align-items:center;gap:16px;padding:18px 32px 14px;border-bottom:1px solid #E4E2D8;background:#F4F4EF;">
+        <div style="min-width:0;">
+          <h1 style="margin:0;font-size:21px;font-weight:800;letter-spacing:-.02em;color:#0A1B33;">{{ viewTitle }}</h1>
+          <div style="font-size:12.5px;color:#67707E;margin-top:2px;">{{ viewSub }}</div>
+        </div>
+        <div style="margin-left:auto;display:flex;align-items:center;gap:10px;">
+          <button onClick="{{ exportCsv }}" style="display:flex;align-items:center;gap:8px;border:1px solid #D8D6CC;background:#fff;color:#14202E;font-size:13px;font-weight:600;border-radius:10px;padding:9px 14px;cursor:pointer;" style-hover="border-color:#1060FF;color:#1060FF;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v12m0 0l-4-4m4 4l4-4M4 21h16"></path></svg>
+            Export CSV
+          </button>
+        </div>
+      </div>
+    </sc-if>
+
+    <div style="flex:1;overflow-y:auto;padding:24px 32px 90px;">
+
+      <sc-if value="{{ isDash }}" hint-placeholder-val="{{ true }}">
+        <div style="max-width:1020px;margin:0 auto;">
+          <div style="text-align:center;padding:30px 0 0;">
+            <div style="font-size:12.5px;font-weight:600;color:#9AA1AC;">{{ datumLabel }}</div>
+            <h2 style="margin:10px 0 0;font-size:34px;font-weight:800;letter-spacing:-.025em;color:#0A1B33;">{{ greeting }}</h2>
+            <div style="font-size:14px;color:#67707E;margin-top:10px;">{{ totaal }} financiers · {{ ppCount }} preferred partners · {{ openCases }} casussen in behandeling</div>
+          </div>
+
+          <div onClick="{{ openCaseModal }}" style="position:relative;overflow:hidden;margin:30px auto 0;max-width:780px;background:#0A1B33;border-radius:20px;padding:10px 10px 4px;cursor:pointer;box-shadow:0 18px 44px rgba(10,27,51,.16);" style-hover="box-shadow:0 24px 56px rgba(10,27,51,.26);">
+            <div style="position:absolute;inset:0;background:radial-gradient(ellipse 70% 130% at 92% -25%,rgba(16,96,255,.38),transparent 62%);pointer-events:none;"></div>
+            <div style="position:relative;display:flex;align-items:center;gap:14px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:14px;padding:14px 14px 14px 18px;">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#4E86FF" stroke-width="2" style="flex:none;"><path d="M12 3l1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9z"></path><path d="M19 15l.9 2.1L22 18l-2.1.9L19 21l-.9-2.1L16 18l2.1-.9z"></path></svg>
+              <span style="font-size:14.5px;color:#8FA0B8;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">Beschrijf de klantcasus of upload het dossier…</span>
+              <span style="margin-left:auto;flex:none;display:flex;align-items:center;gap:8px;background:#1060FF;color:#fff;font-size:13.5px;font-weight:700;border-radius:10px;padding:11px 20px;">Start casus<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14m0 0l-6-6m6 6l-6 6"></path></svg></span>
+            </div>
+            <div style="position:relative;display:flex;align-items:center;justify-content:center;gap:16px;padding:10px 16px;font-size:11.5px;color:#5F7392;flex-wrap:wrap;">
+              <span>AI beoordeelt alle {{ totaal }} financiers</span><span style="color:#2c4266;">·</span><span>rapport met shortlist &amp; dealstructuur</span><span style="color:#2c4266;">·</span><span>PDF of Word direct uploaden</span>
+            </div>
+          </div>
+
+          <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:34px;">
+            <div onClick="{{ goList }}" style="background:#fff;border:1px solid #E4E2D8;border-radius:16px;padding:18px;cursor:pointer;display:flex;flex-direction:column;gap:12px;" style-hover="border-color:#1060FF;box-shadow:0 8px 22px rgba(16,96,255,.1);">
+              <span style="width:36px;height:36px;border-radius:10px;background:#EAF0FF;display:flex;align-items:center;justify-content:center;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#1060FF" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h10"></path></svg></span>
+              <span><span style="display:block;font-size:14px;font-weight:800;color:#0A1B33;">Database</span><span style="display:block;font-size:12px;color:#9AA1AC;margin-top:2px;">{{ totaal }} financiers</span></span>
+            </div>
+            <div onClick="{{ goMatch }}" style="background:#fff;border:1px solid #E4E2D8;border-radius:16px;padding:18px;cursor:pointer;display:flex;flex-direction:column;gap:12px;" style-hover="border-color:#1060FF;box-shadow:0 8px 22px rgba(16,96,255,.1);">
+              <span style="width:36px;height:36px;border-radius:10px;background:#EAF0FF;display:flex;align-items:center;justify-content:center;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#1060FF" stroke-width="2"><circle cx="11" cy="11" r="7"></circle><path d="M21 21l-4.3-4.3"></path></svg></span>
+              <span><span style="display:block;font-size:14px;font-weight:800;color:#0A1B33;">Matching</span><span style="display:block;font-size:12px;color:#9AA1AC;margin-top:2px;">snelle shortlist</span></span>
+            </div>
+            <div onClick="{{ goCompare }}" style="background:#fff;border:1px solid #E4E2D8;border-radius:16px;padding:18px;cursor:pointer;display:flex;flex-direction:column;gap:12px;" style-hover="border-color:#1060FF;box-shadow:0 8px 22px rgba(16,96,255,.1);">
+              <span style="width:36px;height:36px;border-radius:10px;background:#EAF0FF;display:flex;align-items:center;justify-content:center;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#1060FF" stroke-width="2"><path d="M9 3v18M15 3v18M3 9h18M3 15h18"></path></svg></span>
+              <span><span style="display:block;font-size:14px;font-weight:800;color:#0A1B33;">Vergelijken</span><span style="display:block;font-size:12px;color:#9AA1AC;margin-top:2px;">{{ compareCount }} geselecteerd</span></span>
+            </div>
+            <div onClick="{{ goEnrich }}" style="background:#fff;border:1px solid #E4E2D8;border-radius:16px;padding:18px;cursor:pointer;display:flex;flex-direction:column;gap:12px;" style-hover="border-color:#1060FF;box-shadow:0 8px 22px rgba(16,96,255,.1);">
+              <span style="width:36px;height:36px;border-radius:10px;background:#EAF0FF;display:flex;align-items:center;justify-content:center;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#1060FF" stroke-width="2"><path d="M12 3l1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9z"></path><path d="M19 15l.9 2.1L22 18l-2.1.9L19 21l-.9-2.1L16 18l2.1-.9z"></path></svg></span>
+              <span><span style="display:block;font-size:14px;font-weight:800;color:#0A1B33;">AI-verrijking</span><span style="display:block;font-size:12px;color:#9AA1AC;margin-top:2px;">{{ enrichCount }} voorstellen</span></span>
+            </div>
+          </div>
+
+        <div style="margin-top:28px;">
+          <div style="display:flex;align-items:baseline;gap:10px;">
+            <h2 style="margin:0;font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#9AA1AC;">Snelfilters</h2>
+            <span style="font-size:12px;color:#9AA1AC;">klik om de database gefilterd te openen</span>
+          </div>
+          <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:12px;">
+            <sc-for list="{{ quickChips }}" as="chip" hint-placeholder-count="9">
+              <button onClick="{{ chip.go }}" style="display:flex;align-items:center;gap:8px;border:1px solid #E4E2D8;background:#fff;border-radius:99px;padding:8px 15px;font-size:13px;font-weight:600;color:#14202E;cursor:pointer;box-shadow:0 1px 2px rgba(10,27,51,.04);" style-hover="border-color:#1060FF;color:#1060FF;box-shadow:0 3px 10px rgba(16,96,255,.12);">
+                {{ chip.label }}
+                <span style="font-size:11.5px;font-weight:700;color:#1060FF;background:#EAF0FF;border-radius:99px;padding:1px 8px;font-variant-numeric:tabular-nums;">{{ chip.count }}</span>
+              </button>
+            </sc-for>
+          </div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1.15fr .85fr;gap:16px;margin-top:28px;align-items:stretch;">
+          <div style="background:#fff;border:1px solid #E4E2D8;border-radius:16px;padding:20px 22px;display:flex;flex-direction:column;">
+            <div style="display:flex;align-items:center;gap:8px;">
+              <h2 style="margin:0;font-size:15px;font-weight:700;color:#0A1B33;">Recente casussen</h2>
+              <button onClick="{{ goCases }}" style="margin-left:auto;border:none;background:none;color:#1060FF;font-size:12px;font-weight:700;cursor:pointer;padding:0;" style-hover="color:#0B4EDC;">Alle casussen →</button>
+            </div>
+            <sc-if value="{{ casesEmpty }}" hint-placeholder-val="{{ false }}">
+              <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:26px 20px;">
+                <div style="font-size:13px;font-weight:700;color:#0A1B33;">Nog geen casussen</div>
+                <div style="font-size:12px;color:#9AA1AC;margin-top:5px;line-height:1.55;max-width:280px;">Start hierboven een casus — de AI zoekt kansrijke financiers en schrijft het rapport.</div>
+              </div>
+            </sc-if>
+            <div style="display:flex;flex-direction:column;gap:7px;margin-top:12px;">
+              <sc-for list="{{ recentCases }}" as="rc" hint-placeholder-count="0">
+                <div onClick="{{ rc.open }}" style="display:flex;align-items:center;gap:10px;padding:10px 13px;border:1px solid #EFEEE8;border-radius:12px;cursor:pointer;background:#FBFAF6;" style-hover="border-color:#1060FF;background:#fff;">
+                  <span style="min-width:0;">
+                    <span style="display:block;font-size:13px;font-weight:700;color:#0A1B33;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ rc.klant }}</span>
+                    <span style="display:block;font-size:11.5px;color:#9AA1AC;margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ rc.titel }}</span>
+                  </span>
+                  <span style="margin-left:auto;flex:none;display:flex;align-items:center;gap:5px;font-size:11px;font-weight:600;color:{{ rc.repFg }};"><span style="width:6px;height:6px;border-radius:99px;background:{{ rc.repFg }};"></span>{{ rc.repText }}</span>
+                  <span style="flex:none;font-size:10.5px;font-weight:700;color:{{ rc.stFg }};background:{{ rc.stBg }};border-radius:99px;padding:3px 9px;">{{ rc.status }}</span>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+          <div style="position:relative;overflow:hidden;background:#0A1B33;border-radius:16px;padding:22px;color:#fff;">
+            <div style="position:absolute;inset:0;background:radial-gradient(ellipse 80% 100% at 90% -15%,rgba(16,96,255,.3),transparent 60%);pointer-events:none;"></div>
+            <div style="position:relative;">
+              <h2 style="margin:0;font-size:15px;font-weight:700;">Netwerkstatus</h2>
+              <div style="display:flex;align-items:center;gap:20px;margin-top:16px;">
+                <div style="position:relative;width:118px;height:118px;flex:none;">
+                  <svg width="118" height="118" viewBox="0 0 140 140" style="transform:rotate(-90deg);">
+                    <circle cx="70" cy="70" r="56" fill="none" stroke="rgba(255,255,255,.09)" stroke-width="13"></circle>
+                    <circle cx="70" cy="70" r="56" fill="none" stroke="#3DDC84" stroke-width="13" stroke-dasharray="{{ ringHoog }}"></circle>
+                    <circle cx="70" cy="70" r="56" fill="none" stroke="#4E86FF" stroke-width="13" stroke-dasharray="{{ ringMiddel }}" stroke-dashoffset="{{ ringMiddelOff }}"></circle>
+                    <circle cx="70" cy="70" r="56" fill="none" stroke="#E0A03C" stroke-width="13" stroke-dasharray="{{ ringLaag }}" stroke-dashoffset="{{ ringLaagOff }}"></circle>
+                  </svg>
+                  <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;">
+                    <div style="font-size:22px;font-weight:800;letter-spacing:-.02em;font-variant-numeric:tabular-nums;">{{ pctData }}</div>
+                    <div style="font-size:8.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#7C8DA8;">profieldata</div>
+                  </div>
+                </div>
+                <div style="display:flex;flex-direction:column;gap:8px;min-width:0;flex:1;">
+                  <div style="display:flex;align-items:center;gap:8px;font-size:12px;color:#B9C4D6;"><span style="width:8px;height:8px;border-radius:3px;background:#3DDC84;flex:none;"></span>hoog<b style="margin-left:auto;color:#fff;font-variant-numeric:tabular-nums;">{{ qHoog }}</b></div>
+                  <div style="display:flex;align-items:center;gap:8px;font-size:12px;color:#B9C4D6;"><span style="width:8px;height:8px;border-radius:3px;background:#4E86FF;flex:none;"></span>middel<b style="margin-left:auto;color:#fff;font-variant-numeric:tabular-nums;">{{ qMiddel }}</b></div>
+                  <div style="display:flex;align-items:center;gap:8px;font-size:12px;color:#B9C4D6;"><span style="width:8px;height:8px;border-radius:3px;background:#E0A03C;flex:none;"></span>laag<b style="margin-left:auto;color:#fff;font-variant-numeric:tabular-nums;">{{ qLaag }}</b></div>
+                </div>
+              </div>
+              <div style="border-top:1px solid rgba(255,255,255,.1);margin-top:16px;padding-top:12px;display:flex;flex-direction:column;gap:8px;">
+                <div style="display:flex;font-size:12px;color:#B9C4D6;">Rente bekend<b style="margin-left:auto;color:#fff;font-variant-numeric:tabular-nums;">{{ kpiRente }}</b></div>
+                <div style="display:flex;font-size:12px;color:#B9C4D6;">Gevalideerd<b style="margin-left:auto;color:#fff;font-variant-numeric:tabular-nums;">{{ kpiValid }}</b></div>
+                <div style="display:flex;font-size:12px;color:#B9C4D6;">Preferred partners<b style="margin-left:auto;color:#fff;font-variant-numeric:tabular-nums;">{{ ppCount }}</b></div>
+              </div>
+              <button onClick="{{ goEnrich }}" style="margin-top:14px;width:100%;border:none;background:rgba(255,255,255,.1);color:#fff;font-size:12px;font-weight:700;border-radius:9px;padding:9px;cursor:pointer;" style-hover="background:rgba(255,255,255,.18);">Start verrijking</button>
+            </div>
+          </div>
+        </div>
+        <div style="text-align:center;font-size:11px;color:#B4B8AE;margin-top:26px;">Intern gebruik · alleen publieke bronnen · AVG-bewust · bron: financiersoverzicht (xlsx)</div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ isCases }}" hint-placeholder-val="{{ false }}">
+        <sc-if value="{{ caseListOn }}" hint-placeholder-val="{{ true }}">
+          <sc-if value="{{ casesEmpty }}" hint-placeholder-val="{{ false }}">
+            <div style="background:#fff;border:1px dashed #D8D6CC;border-radius:16px;padding:56px;text-align:center;max-width:600px;margin:40px auto;">
+              <div style="width:44px;height:44px;border-radius:12px;background:#EAF0FF;display:flex;align-items:center;justify-content:center;margin:0 auto;">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1060FF" stroke-width="2"><path d="M14 3H7a2 2 0 00-2 2v14a2 2 0 002 2h10a2 2 0 002-2V8z"></path><path d="M14 3v5h5M9 13h6M9 17h4"></path></svg>
+              </div>
+              <div style="font-size:16px;font-weight:700;color:#0A1B33;margin-top:14px;">Nog geen casussen</div>
+              <div style="font-size:13px;color:#67707E;margin-top:8px;line-height:1.6;">Maak een casus aan voor een klantvraag. De AI beoordeelt vervolgens alle {{ totaal }} financiers en levert een rapport met kansrijke matches, motivatie en dealstructuur.</div>
+              <button onClick="{{ openCaseModal }}" style="margin-top:18px;border:none;background:#1060FF;color:#fff;font-size:13px;font-weight:700;border-radius:10px;padding:11px 20px;cursor:pointer;" style-hover="background:#0B4EDC;">+ Nieuwe casus</button>
+            </div>
+          </sc-if>
+          <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:14px;">
+            <sc-for list="{{ caseCards }}" as="c" hint-placeholder-count="0">
+              <div onClick="{{ c.open }}" style="background:#fff;border:1px solid #E4E2D8;border-radius:16px;padding:18px 20px;cursor:pointer;display:flex;flex-direction:column;gap:10px;" style-hover="border-color:#1060FF;">
+                <div style="display:flex;align-items:flex-start;gap:10px;">
+                  <div style="min-width:0;">
+                    <div style="font-size:14.5px;font-weight:800;color:#0A1B33;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ c.klant }}</div>
+                    <div style="font-size:12px;color:#67707E;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ c.titel }}</div>
+                  </div>
+                  <span style="margin-left:auto;flex:none;font-size:11px;font-weight:700;color:{{ c.stFg }};background:{{ c.stBg }};border-radius:99px;padding:4px 11px;white-space:nowrap;">{{ c.status }}</span>
+                </div>
+                <div style="font-size:12.5px;color:#48505C;line-height:1.55;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;">{{ c.preview }}</div>
+                <div style="display:flex;align-items:center;gap:10px;border-top:1px solid #F3F2EC;padding-top:10px;margin-top:auto;">
+                  <span style="font-size:12px;font-weight:700;color:#0A1B33;font-variant-numeric:tabular-nums;">{{ c.bedrag }}</span>
+                  <span style="font-size:11.5px;color:#9AA1AC;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0;">{{ c.vorm }}</span>
+                  <span style="margin-left:auto;flex:none;display:flex;align-items:center;gap:5px;font-size:11.5px;font-weight:600;color:{{ c.repFg }};"><span style="width:7px;height:7px;border-radius:99px;background:{{ c.repFg }};"></span>{{ c.repText }}</span>
+                </div>
+              </div>
+            </sc-for>
+          </div>
+        </sc-if>
+        <sc-if value="{{ caseOpen }}" hint-placeholder-val="{{ false }}">
+          <button onClick="{{ backToCases }}" style="border:none;background:none;color:#67707E;font-size:12.5px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:6px;padding:0;" style-hover="color:#1060FF;">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 19l-7-7 7-7"></path></svg> Alle casussen
+          </button>
+          <div style="background:#fff;border:1px solid #E4E2D8;border-radius:16px;padding:22px 24px;margin-top:12px;">
+            <div style="display:flex;align-items:flex-start;gap:12px;flex-wrap:wrap;">
+              <div style="min-width:0;">
+                <h2 style="margin:0;font-size:18px;font-weight:800;color:#0A1B33;">{{ ccKlant }}</h2>
+                <div style="font-size:12.5px;color:#67707E;margin-top:3px;">{{ ccMeta }}</div>
+              </div>
+              <div style="margin-left:auto;display:flex;align-items:center;gap:8px;">
+                <select value="{{ ccStatus }}" onChange="{{ onCcStatus }}" style="border:1px solid #D8D6CC;border-radius:10px;padding:8px 10px;font-size:12.5px;font-weight:600;background:#fff;color:#14202E;">
+                  <option>Intake</option><option>Uitgezet bij financiers</option><option>Offerte ontvangen</option><option>Gesloten</option><option>Niet doorgegaan</option>
+                </select>
+                <button onClick="{{ delCase }}" style="border:1px solid #D8D6CC;background:#fff;color:#BE3E2B;font-size:12px;font-weight:600;border-radius:9px;padding:8px 12px;cursor:pointer;" style-hover="border-color:#BE3E2B;">Verwijder</button>
+              </div>
+            </div>
+            <textarea value="{{ ccTekst }}" onChange="{{ onCcTekst }}" rows="5" style="margin-top:14px;width:100%;border:1px solid #E4E2D8;background:#FBFAF6;color:#14202E;border-radius:12px;padding:12px 14px;font-size:13px;line-height:1.6;resize:vertical;outline-color:#1060FF;"></textarea>
+            <div style="display:flex;align-items:center;gap:12px;margin-top:12px;flex-wrap:wrap;">
+              <button onClick="{{ genReport }}" style="display:flex;align-items:center;gap:8px;border:none;background:#1060FF;color:#fff;font-size:13.5px;font-weight:700;border-radius:10px;padding:11px 20px;cursor:pointer;" style-hover="background:#0B4EDC;">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3l1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9z"></path></svg>
+                {{ reportBtnLabel }}
+              </button>
+              <label style="display:flex;align-items:center;gap:8px;border:1px solid #D8D6CC;background:#fff;color:#14202E;font-size:12.5px;font-weight:600;border-radius:10px;padding:10px 16px;cursor:pointer;" style-hover="border-color:#1060FF;color:#1060FF;">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 15V3m0 0L8 7m4-4l4 4"></path><path d="M4 17v2a2 2 0 002 2h12a2 2 0 002-2v-2"></path></svg>
+                {{ uploadLabel }}
+                <input type="file" accept=".pdf,.docx,.txt,.md,.rtf,.csv" onChange="{{ uploadCaseFile }}" style="display:none;" />
+              </label>
+              <button onClick="{{ analyseKengetallen }}" style="display:flex;align-items:center;gap:8px;border:1px solid #D8D6CC;background:#fff;color:#14202E;font-size:12.5px;font-weight:600;border-radius:10px;padding:10px 16px;cursor:pointer;" style-hover="border-color:#1060FF;color:#1060FF;">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18M8 15l3-4 3 2 5-7"></path></svg>
+                {{ kfBtnLabel }}
+              </button>
+              <span style="font-size:12px;color:#67707E;">{{ reportHint }}</span>
+            </div>
+          </div>
+          <sc-if value="{{ hasKengetallen }}" hint-placeholder-val="{{ false }}">
+            <div style="background:#fff;border:1px solid #E4E2D8;border-radius:16px;padding:18px 22px;margin-top:14px;">
+              <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+                <h2 style="margin:0;font-size:14px;font-weight:800;color:#0A1B33;">Kengetallen uit de casus</h2>
+                <span style="font-size:11px;font-weight:700;color:#0B4EDC;background:#EAF0FF;border-radius:99px;padding:3px 10px;">controleer vóór rapport</span>
+                <span style="margin-left:auto;font-size:11px;color:#9AA1AC;">{{ kernMeta }}</span>
+              </div>
+              <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:12px;">
+                <sc-for list="{{ kernVelden }}" as="kv" hint-placeholder-count="0">
+                  <span style="font-size:12px;background:#FBFAF6;border:1px solid #EFEEE8;border-radius:9px;padding:5px 11px;color:#14202E;font-variant-numeric:tabular-nums;"><b style="color:#67707E;font-weight:600;">{{ kv.label }}</b> {{ kv.waarde }}</span>
+                </sc-for>
+              </div>
+              <sc-if value="{{ kernHasToelichting }}" hint-placeholder-val="{{ false }}">
+                <div style="margin-top:10px;font-size:12px;color:#9A5B0B;background:#F9EFDD;border-radius:9px;padding:8px 12px;line-height:1.55;"><b>Nog onbekend:</b> {{ kernToelichting }} — vul de casustekst aan en klik op “Kengetallen herberekenen” voor een scherper rapport.</div>
+              </sc-if>
+            </div>
+          </sc-if>
+          <sc-if value="{{ hasReport }}" hint-placeholder-val="{{ false }}">
+            <div style="background:#fff;border:1px solid #E4E2D8;border-radius:16px;padding:24px;margin-top:20px;">
+              <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+                <h2 style="margin:0;font-size:16px;font-weight:800;color:#0A1B33;">Rapport</h2>
+                <span style="font-size:11px;font-weight:700;color:#9A5B0B;background:#F9EFDD;border-radius:99px;padding:3px 10px;">Concept — te valideren door adviseur</span>
+                <span style="margin-left:auto;font-size:11px;color:#9AA1AC;">{{ repMeta }}</span>
+                <button onClick="{{ printReport }}" style="display:flex;align-items:center;gap:6px;border:1px solid #D8D6CC;background:#fff;color:#14202E;font-size:12px;font-weight:600;border-radius:9px;padding:7px 12px;cursor:pointer;" style-hover="border-color:#1060FF;color:#1060FF;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9V3h12v6M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2m-12-4h12v7H6z"></path></svg>Print / PDF</button>
+                <button onClick="{{ exportWord }}" style="display:flex;align-items:center;gap:6px;border:1px solid #D8D6CC;background:#fff;color:#14202E;font-size:12px;font-weight:600;border-radius:9px;padding:7px 12px;cursor:pointer;" style-hover="border-color:#1060FF;color:#1060FF;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 3H7a2 2 0 00-2 2v14a2 2 0 002 2h10a2 2 0 002-2V8z"></path><path d="M14 3v5h5"></path></svg>Word</button>
+              </div>
+              <p style="font-size:13.5px;color:#14202E;line-height:1.65;margin:12px 0 0;">{{ repSamenvatting }}</p>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:16px;">
+                <div style="background:#FBFAF6;border:1px solid #EFEEE8;border-radius:12px;padding:14px 16px;">
+                  <div style="font-size:10.5px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:#1060FF;">Casusanalyse</div>
+                  <div style="font-size:12.5px;color:#14202E;line-height:1.6;margin-top:6px;">{{ repGevraagd }}</div>
+                  <div style="font-size:12px;color:#67707E;line-height:1.6;margin-top:4px;">{{ repRatios }}</div>
+                  <sc-if value="{{ repHasProfiel }}" hint-placeholder-val="{{ false }}">
+                    <div style="font-size:12px;color:#48505C;line-height:1.6;margin-top:8px;border-top:1px solid #EFEEE8;padding-top:8px;">{{ repProfiel }}</div>
+                  </sc-if>
+                  <sc-if value="{{ repHasKern }}" hint-placeholder-val="{{ false }}">
+                    <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:10px;">
+                      <sc-for list="{{ repKern }}" as="kg" hint-placeholder-count="0">
+                        <span style="font-size:11.5px;background:#fff;border:1px solid #E4E2D8;border-radius:8px;padding:4px 9px;color:#14202E;font-variant-numeric:tabular-nums;"><b style="color:#67707E;font-weight:600;">{{ kg.label }}</b> {{ kg.waarde }}</span>
+                      </sc-for>
+                    </div>
+                  </sc-if>
+                </div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+                  <div><div style="font-size:10.5px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:#0E7A4C;">Sterktes</div><div style="font-size:12.5px;color:#14202E;line-height:1.65;margin-top:6px;">{{ repSterktes }}</div></div>
+                  <div><div style="font-size:10.5px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:#9A5B0B;">Risico's</div><div style="font-size:12.5px;color:#48505C;line-height:1.65;margin-top:6px;">{{ repRisicos }}</div></div>
+                </div>
+              </div>
+              <div style="display:flex;flex-direction:column;gap:10px;margin-top:18px;">
+                <sc-for list="{{ repCards }}" as="m" hint-placeholder-count="0">
+                  <div style="border:1px solid #E4E2D8;border-radius:14px;padding:16px 18px;">
+                    <div style="display:flex;align-items:center;gap:12px;">
+                      <div style="width:32px;height:32px;flex:none;border-radius:9px;background:#0A1B33;color:#fff;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;font-variant-numeric:tabular-nums;">{{ m.rank }}</div>
+                      <div style="min-width:0;">
+                        <div style="font-size:14px;font-weight:800;color:#0A1B33;">{{ m.naam }}</div>
+                        <span style="display:inline-block;font-size:11px;font-weight:600;color:{{ m.typeFg }};background:{{ m.typeBg }};border-radius:99px;padding:2px 8px;margin-top:2px;">{{ m.type }}</span>
+                      </div>
+                      <span style="margin-left:auto;font-size:11px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;color:{{ m.kansFg }};background:{{ m.kansBg }};border-radius:99px;padding:4px 12px;">kans {{ m.kans }} · {{ m.score }}%</span>
+                    </div>
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:12px;">
+                      <div><div style="font-size:10.5px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:#0E7A4C;">Motivatie</div><div style="font-size:12.5px;color:#14202E;line-height:1.6;margin-top:4px;">{{ m.motivatie }}</div></div>
+                      <div><div style="font-size:10.5px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:#9A5B0B;">Aandachtspunten</div><div style="font-size:12.5px;color:#48505C;line-height:1.6;margin-top:4px;">{{ m.aandacht }}</div></div>
+                    </div>
+                    <div style="margin-top:10px;background:#FBFAF6;border:1px solid #EFEEE8;border-radius:10px;padding:9px 13px;font-size:12.5px;color:#14202E;line-height:1.55;"><b style="color:#1060FF;">Indicatieve structuur:</b> {{ m.structuur }}</div>
+                    <sc-if value="{{ m.hasDetail }}" hint-placeholder-val="{{ false }}">
+                      <div style="display:grid;grid-template-columns:1fr 1fr;gap:2px 20px;margin-top:8px;">
+                        <sc-for list="{{ m.detail }}" as="dv" hint-placeholder-count="0">
+                          <div style="display:flex;gap:8px;padding:4px 0;border-bottom:1px solid #F6F5F0;font-size:12px;">
+                            <span style="flex:none;width:110px;color:#9AA1AC;font-weight:600;">{{ dv.k }}</span>
+                            <span style="color:#14202E;line-height:1.5;min-width:0;">{{ dv.v }}</span>
+                          </div>
+                        </sc-for>
+                      </div>
+                    </sc-if>
+                    <div style="display:flex;gap:8px;margin-top:12px;">
+                      <button onClick="{{ m.open }}" style="border:1px solid #D8D6CC;background:#fff;color:#14202E;font-size:12px;font-weight:600;border-radius:9px;padding:7px 12px;cursor:pointer;" style-hover="border-color:#1060FF;color:#1060FF;">Profiel</button>
+                      <button onClick="{{ m.addCompare }}" style="border:1px solid #D8D6CC;background:#fff;color:#14202E;font-size:12px;font-weight:600;border-radius:9px;padding:7px 12px;cursor:pointer;" style-hover="border-color:#1060FF;color:#1060FF;">+ Vergelijk</button>
+                    </div>
+                  </div>
+                </sc-for>
+              </div>
+              <sc-if value="{{ repHasAfvallers }}" hint-placeholder-val="{{ false }}">
+                <div style="margin-top:16px;">
+                  <div style="font-size:10.5px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:#BE3E2B;">Bewust niet voorgesteld</div>
+                  <div style="display:flex;flex-direction:column;gap:6px;margin-top:8px;">
+                    <sc-for list="{{ repAfvallers }}" as="af" hint-placeholder-count="0">
+                      <div style="display:flex;gap:10px;font-size:12.5px;line-height:1.55;background:#FBFAF6;border:1px solid #EFEEE8;border-radius:10px;padding:8px 13px;">
+                        <b style="flex:none;color:#0A1B33;">{{ af.naam }}</b><span style="color:#48505C;min-width:0;">{{ af.reden }}</span>
+                      </div>
+                    </sc-for>
+                  </div>
+                </div>
+              </sc-if>
+              <sc-if value="{{ repHasTips }}" hint-placeholder-val="{{ false }}">
+                <div style="margin-top:16px;"><div style="font-size:10.5px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:#7C3AED;">Onderhandelingstips</div><div style="font-size:12.5px;color:#14202E;line-height:1.7;margin-top:6px;">{{ repTips }}</div></div>
+              </sc-if>
+              <sc-if value="{{ repHasRoutes }}" hint-placeholder-val="{{ false }}">
+                <div style="margin-top:16px;"><div style="font-size:10.5px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:#1060FF;">Alternatieve routes</div><div style="font-size:12.5px;color:#14202E;line-height:1.7;margin-top:6px;">{{ repRoutes }}</div></div>
+              </sc-if>
+              <div style="margin-top:16px;"><div style="font-size:10.5px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:#0A1B33;">Vervolgstappen</div><div style="font-size:12.5px;color:#14202E;line-height:1.7;margin-top:6px;">{{ repStappen }}</div></div>
+              <div style="margin-top:14px;background:#FBFAF6;border:1px solid #EFEEE8;border-radius:10px;padding:10px 14px;font-size:11.5px;color:#67707E;line-height:1.6;">{{ repDisclaimer }}</div>
+            </div>
+          </sc-if>
+          <div style="background:#fff;border:1px solid #E4E2D8;border-radius:16px;padding:20px 24px;margin-top:20px;">
+            <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+              <h2 style="margin:0;font-size:15px;font-weight:800;color:#0A1B33;">Uitkomst bij financiers</h2>
+              <span style="font-size:12px;color:#67707E;">leg vast wie financierde of afwees — de matching leert hiervan</span>
+            </div>
+            <div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap;">
+              <select value="{{ ufFid }}" onChange="{{ onUfFid }}" style="flex:2;min-width:200px;border:1px solid #D8D6CC;border-radius:10px;padding:9px 10px;font-size:13px;background:#fff;">
+                <sc-for list="{{ allFinOptions }}" as="o" hint-placeholder-count="3">
+                  <option value="{{ o.id }}">{{ o.naam }}</option>
+                </sc-for>
+              </select>
+              <select value="{{ ufResultaat }}" onChange="{{ onUfResultaat }}" style="flex:1;min-width:140px;border:1px solid #D8D6CC;border-radius:10px;padding:9px 10px;font-size:13px;background:#fff;">
+                <option>Gefinancierd</option><option>Offerte ontvangen</option><option>Afgewezen</option>
+              </select>
+              <input value="{{ ufReden }}" onChange="{{ onUfReden }}" placeholder="Reden / conditie (bv. sector te risicovol, LTV te hoog)…" style="flex:3;min-width:220px;border:1px solid #D8D6CC;border-radius:10px;padding:9px 12px;font-size:13px;background:#fff;" />
+              <button onClick="{{ addUitkomst }}" style="border:none;background:#0A1B33;color:#fff;font-size:12.5px;font-weight:700;border-radius:10px;padding:9px 18px;cursor:pointer;" style-hover="background:#122c50;">Vastleggen</button>
+            </div>
+            <sc-if value="{{ hasUitkomsten }}" hint-placeholder-val="{{ false }}">
+              <div style="display:flex;flex-direction:column;gap:6px;margin-top:12px;">
+                <sc-for list="{{ uitkomstCards }}" as="u" hint-placeholder-count="0">
+                  <div style="display:flex;align-items:center;gap:10px;background:#FBFAF6;border:1px solid #EFEEE8;border-radius:10px;padding:8px 13px;font-size:12.5px;">
+                    <b style="flex:none;color:#0A1B33;">{{ u.naam }}</b>
+                    <span style="flex:none;font-size:11px;font-weight:700;color:{{ u.fg }};background:{{ u.bg }};border-radius:99px;padding:2px 9px;">{{ u.resultaat }}</span>
+                    <span style="color:#48505C;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">{{ u.reden }}</span>
+                    <span style="margin-left:auto;flex:none;font-size:11px;color:#9AA1AC;">{{ u.ts }}</span>
+                    <button onClick="{{ u.del }}" style="flex:none;border:none;background:none;color:#9AA1AC;cursor:pointer;font-size:14px;line-height:1;padding:2px;" style-hover="color:#BE3E2B;">×</button>
+                  </div>
+                </sc-for>
+              </div>
+            </sc-if>
+          </div>
+        </sc-if>
+      </sc-if>
+
+      <sc-if value="{{ isList }}" hint-placeholder-val="{{ false }}">
+        <div style="display:flex;flex-wrap:wrap;gap:10px;align-items:center;">
+          <div style="position:relative;flex:1;min-width:220px;max-width:340px;">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#67707E" stroke-width="2" style="position:absolute;left:12px;top:11px;"><circle cx="11" cy="11" r="7"></circle><path d="M21 21l-4.3-4.3"></path></svg>
+            <input value="{{ search }}" onChange="{{ onSearch }}" placeholder="Zoek op naam, plaats, e-mail…" style="width:100%;border:1px solid #D8D6CC;border-radius:10px;padding:9px 12px 9px 34px;font-size:13.5px;background:#fff;outline-color:#1060FF;" />
+          </div>
+          <select value="{{ fType }}" onChange="{{ onFType }}" style="border:1px solid #D8D6CC;border-radius:10px;padding:9px 10px;font-size:13px;background:#fff;color:#14202E;">
+            <option value="">Alle types</option>
+            <option>Bank</option><option>Non-bank lender</option><option>Factoringmaatschappij</option><option>Leasemaatschappij</option><option>Crowdfundingplatform</option><option>Vastgoedfinancier</option><option>Investeerder / fonds</option><option>Overheidsregeling / stichting</option><option>Kredietkaart / betaaloplossing</option>
+          </select>
+          <select value="{{ fVorm }}" onChange="{{ onFVorm }}" style="border:1px solid #D8D6CC;border-radius:10px;padding:9px 10px;font-size:13px;background:#fff;color:#14202E;">
+            <option value="">Alle financieringsvormen</option>
+            <option>Vastgoedfinanciering</option><option>Verhuurhypotheek</option><option>Bedrijfshypotheek</option><option>Werkkapitaal</option><option>Rekening-courant krediet</option><option>Overnamefinanciering</option><option>Leasing</option><option>Equipment finance</option><option>Factoring</option><option>Debiteurenfinanciering</option><option>MKB-lening</option><option>Groeifinanciering</option><option>Achtergestelde lening</option><option>Microkrediet</option>
+          </select>
+          <select value="{{ fBank }}" onChange="{{ onFBank }}" style="border:1px solid #D8D6CC;border-radius:10px;padding:9px 10px;font-size:13px;background:#fff;color:#14202E;">
+            <option value="">Bank &amp; non-bank</option>
+            <option value="bank">Alleen banken</option>
+            <option value="nonbank">Alleen non-bank</option>
+          </select>
+          <select value="{{ fLabel }}" onChange="{{ onFLabel }}" style="border:1px solid #D8D6CC;border-radius:10px;padding:9px 10px;font-size:13px;background:#fff;color:#14202E;">
+            <option value="">Alle labels</option>
+            <option>Preferred Partner</option><option>Eigendom</option><option>Fyndoo</option><option>Marketing</option>
+          </select>
+          <select value="{{ fData }}" onChange="{{ onFData }}" style="border:1px solid #D8D6CC;border-radius:10px;padding:9px 10px;font-size:13px;background:#fff;color:#14202E;">
+            <option value="">Alle datastatus</option>
+            <option value="valid">Gevalideerd</option>
+            <option value="ai">AI-voorstel aanwezig</option>
+            <option value="todo">Validatie nodig</option>
+          </select>
+          <button onClick="{{ resetFilters }}" style="border:none;background:none;color:#67707E;font-size:12.5px;font-weight:600;cursor:pointer;text-decoration:underline;">Reset</button>
+        </div>
+        <div style="font-size:12.5px;color:#67707E;margin:14px 0 10px;font-variant-numeric:tabular-nums;">{{ resultLabel }}</div>
+        <div style="background:#fff;border:1px solid #E4E2D8;border-radius:16px;overflow:hidden;">
+          <div style="display:grid;grid-template-columns:36px 1.7fr 1.15fr 1.5fr .8fr 1fr 1.05fr;gap:10px;align-items:center;padding:11px 18px;border-bottom:1px solid #EFEEE8;font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#67707E;">
+            <span></span><span>Financier</span><span>Type</span><span>Vormen</span><span>Rente</span><span>Labels</span><span>Datastatus</span>
+          </div>
+          <sc-for list="{{ rows }}" as="r" hint-placeholder-count="10">
+            <div onClick="{{ r.open }}" style="display:grid;grid-template-columns:36px 1.7fr 1.15fr 1.5fr .8fr 1fr 1.05fr;gap:10px;align-items:center;padding:{{ rowPad }} 18px;border-bottom:1px solid #F3F2EC;cursor:pointer;background:#fff;" style-hover="background:#FAFAF5;">
+              <span onClick="{{ r.toggleCompare }}" style="display:flex;">
+                <span style="width:17px;height:17px;border-radius:5px;border:1.5px solid {{ r.cbBorder }};background:{{ r.cbBg }};display:flex;align-items:center;justify-content:center;">
+                  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.5"><path d="M4 12.5l5 5L20 6.5"></path></svg>
+                </span>
+              </span>
+              <span style="min-width:0;">
+                <span style="display:block;font-size:13.5px;font-weight:700;color:#0A1B33;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ r.naam }}</span>
+                <span style="display:block;font-size:11.5px;color:#67707E;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ r.plaats }}</span>
+              </span>
+              <span><span style="font-size:11.5px;font-weight:600;color:{{ r.typeFg }};background:{{ r.typeBg }};border-radius:99px;padding:3px 9px;white-space:nowrap;">{{ r.type }}</span></span>
+              <span style="font-size:12px;color:#48505C;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ r.vormenText }}</span>
+              <span style="font-size:12.5px;font-weight:600;color:{{ r.renteFg }};font-variant-numeric:tabular-nums;">{{ r.renteText }}</span>
+              <span style="display:flex;gap:4px;flex-wrap:wrap;">
+                <sc-if value="{{ r.isPP }}" hint-placeholder-val="{{ false }}"><span style="font-size:10.5px;font-weight:700;color:#7A5E14;background:#F6EED6;border:1px solid #E3D5A6;border-radius:99px;padding:2px 7px;white-space:nowrap;">Preferred</span></sc-if>
+                <sc-if value="{{ r.isEigendom }}" hint-placeholder-val="{{ false }}"><span style="font-size:10.5px;font-weight:600;color:#48505C;background:#EFEEE8;border-radius:99px;padding:2px 7px;">Eigendom</span></sc-if>
+              </span>
+              <span style="display:flex;align-items:center;gap:6px;font-size:11.5px;font-weight:600;color:{{ r.statusFg }};">
+                <span style="width:7px;height:7px;border-radius:99px;background:{{ r.statusFg }};flex:none;"></span>{{ r.statusText }}
+              </span>
+            </div>
+          </sc-for>
+          <sc-if value="{{ emptyList }}" hint-placeholder-val="{{ false }}">
+            <div style="padding:48px;text-align:center;">
+              <div style="font-size:15px;font-weight:700;color:#0A1B33;">Geen financiers gevonden</div>
+              <div style="font-size:13px;color:#67707E;margin-top:6px;">Pas de filters of zoekterm aan.</div>
+            </div>
+          </sc-if>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ isCompare }}" hint-placeholder-val="{{ false }}">
+        <sc-if value="{{ compareEmpty }}" hint-placeholder-val="{{ false }}">
+          <div style="background:#fff;border:1px dashed #D8D6CC;border-radius:16px;padding:56px;text-align:center;max-width:560px;margin:40px auto;">
+            <div style="font-size:16px;font-weight:700;color:#0A1B33;">Nog geen financiers geselecteerd</div>
+            <div style="font-size:13px;color:#67707E;margin-top:8px;line-height:1.6;">Vink in de database maximaal vier financiers aan om ze hier naast elkaar te vergelijken op producten, rente, bedragen, looptijd, zekerheden en kosten.</div>
+            <button onClick="{{ goList }}" style="margin-top:18px;border:none;background:#1060FF;color:#fff;font-size:13px;font-weight:700;border-radius:10px;padding:10px 18px;cursor:pointer;" style-hover="background:#0B4EDC;">Naar de database</button>
+          </div>
+        </sc-if>
+        <div style="display:grid;grid-template-columns:repeat({{ compareCols }},minmax(230px,1fr));gap:14px;align-items:stretch;">
+          <sc-for list="{{ compareCards }}" as="c" hint-placeholder-count="2">
+            <div style="background:#fff;border:1px solid #E4E2D8;border-radius:16px;padding:20px;display:flex;flex-direction:column;gap:0;">
+              <div style="display:flex;align-items:flex-start;gap:8px;">
+                <div style="min-width:0;">
+                  <div style="font-size:15px;font-weight:800;color:#0A1B33;line-height:1.25;">{{ c.naam }}</div>
+                  <span style="display:inline-block;margin-top:6px;font-size:11px;font-weight:600;color:{{ c.typeFg }};background:{{ c.typeBg }};border-radius:99px;padding:3px 9px;">{{ c.type }}</span>
+                </div>
+                <button onClick="{{ c.remove }}" style="margin-left:auto;border:none;background:none;color:#9AA1AC;cursor:pointer;font-size:16px;line-height:1;padding:2px;" style-hover="color:#BE3E2B;">×</button>
+              </div>
+              <div style="margin-top:14px;display:flex;flex-direction:column;">
+                <div style="border-top:1px solid #F3F2EC;padding:9px 0;"><div style="font-size:10.5px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:#9AA1AC;">Producten</div><div style="font-size:12.5px;color:#14202E;margin-top:3px;line-height:1.5;">{{ c.vormen }}</div></div>
+                <div style="border-top:1px solid #F3F2EC;padding:9px 0;"><div style="font-size:10.5px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:#9AA1AC;">Indicatieve rente</div><div style="font-size:12.5px;color:{{ c.renteFg }};margin-top:3px;font-weight:600;">{{ c.rente }}</div></div>
+                <div style="border-top:1px solid #F3F2EC;padding:9px 0;"><div style="font-size:10.5px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:#9AA1AC;">Bedrag</div><div style="font-size:12.5px;color:#14202E;margin-top:3px;">{{ c.bedrag }}</div></div>
+                <div style="border-top:1px solid #F3F2EC;padding:9px 0;"><div style="font-size:10.5px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:#9AA1AC;">Looptijd</div><div style="font-size:12.5px;color:#14202E;margin-top:3px;">{{ c.looptijd }}</div></div>
+                <div style="border-top:1px solid #F3F2EC;padding:9px 0;"><div style="font-size:10.5px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:#9AA1AC;">Zekerheden</div><div style="font-size:12.5px;color:#14202E;margin-top:3px;line-height:1.5;">{{ c.zekerheden }}</div></div>
+                <div style="border-top:1px solid #F3F2EC;padding:9px 0;"><div style="font-size:10.5px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:#9AA1AC;">Kosten</div><div style="font-size:12.5px;color:#14202E;margin-top:3px;line-height:1.5;">{{ c.kosten }}</div></div>
+                <div style="border-top:1px solid #F3F2EC;padding:9px 0;"><div style="font-size:10.5px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:#9AA1AC;">Beste toepassing</div><div style="font-size:12.5px;color:#14202E;margin-top:3px;line-height:1.5;">{{ c.toepassing }}</div></div>
+                <div style="border-top:1px solid #F3F2EC;padding:9px 0;"><div style="font-size:10.5px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:#9AA1AC;">Aandachtspunten</div><div style="font-size:12.5px;color:#9A5B0B;margin-top:3px;line-height:1.5;">{{ c.aandacht }}</div></div>
+                <div style="border-top:1px solid #F3F2EC;padding:9px 0;"><div style="font-size:10.5px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:#9AA1AC;">Datastatus</div><div style="font-size:12px;font-weight:600;color:{{ c.statusFg }};margin-top:3px;">{{ c.status }}</div></div>
+              </div>
+              <button onClick="{{ c.open }}" style="margin-top:auto;border:1px solid #D8D6CC;background:#fff;color:#14202E;font-size:12.5px;font-weight:600;border-radius:10px;padding:8px;cursor:pointer;" style-hover="border-color:#1060FF;color:#1060FF;">Open profiel</button>
+            </div>
+          </sc-for>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ isMatch }}" hint-placeholder-val="{{ false }}">
+        <div style="display:flex;align-items:center;gap:12px;background:#0A1B33;color:#fff;border-radius:14px;padding:14px 18px;margin-bottom:20px;">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#3b7bff" stroke-width="2" style="flex:none;"><path d="M12 3l1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9z"></path><path d="M19 15l.9 2.1L22 18l-2.1.9L19 21l-.9-2.1L16 18l2.1-.9z"></path></svg>
+          <span style="font-size:13px;line-height:1.5;min-width:0;">Snelle indicatieve shortlist op basis van regels. Voor een volledig <b>AI-casusrapport</b> met motivatie en dealstructuur: maak een casus aan.</span>
+          <button onClick="{{ openCaseModal }}" style="margin-left:auto;flex:none;border:none;background:#1060FF;color:#fff;font-size:12.5px;font-weight:700;border-radius:9px;padding:9px 16px;cursor:pointer;" style-hover="background:#3b7bff;">+ Nieuwe casus</button>
+        </div>
+
+        <div style="display:grid;grid-template-columns:360px 1fr;gap:20px;align-items:start;">
+          <div style="background:#fff;border:1px solid #E4E2D8;border-radius:16px;padding:22px;position:sticky;top:0;">
+            <h2 style="margin:0;font-size:15px;font-weight:800;color:#0A1B33;">Financieringsvraag</h2>
+            <div style="font-size:12px;color:#67707E;margin-top:3px;line-height:1.5;">Vul de klantcasus in; de shortlist toont financiers die waarschijnlijk passen, met uitleg.</div>
+            <div style="display:flex;flex-direction:column;gap:12px;margin-top:16px;">
+              <label style="display:block;"><span style="font-size:11.5px;font-weight:700;color:#48505C;">Type financiering</span>
+                <select value="{{ mfVorm }}" onChange="{{ onMfVorm }}" style="margin-top:5px;width:100%;border:1px solid #D8D6CC;border-radius:10px;padding:9px 10px;font-size:13px;background:#fff;">
+                  <option>Vastgoedfinanciering</option><option>Verhuurhypotheek</option><option>Bedrijfshypotheek</option><option>Werkkapitaal</option><option>Rekening-courant krediet</option><option>Overnamefinanciering</option><option>Leasing</option><option>Factoring</option><option>MKB-lening</option><option>Groeifinanciering</option><option>Achtergestelde lening</option>
+                </select></label>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+                <label style="display:block;"><span style="font-size:11.5px;font-weight:700;color:#48505C;">Bedrag (€)</span>
+                  <input value="{{ mfBedrag }}" onChange="{{ onMfBedrag }}" placeholder="750.000" inputMode="numeric" style="margin-top:5px;width:100%;border:1px solid #D8D6CC;border-radius:10px;padding:9px 10px;font-size:13px;background:#fff;" /></label>
+                <label style="display:block;"><span style="font-size:11.5px;font-weight:700;color:#48505C;">Looptijd</span>
+                  <select value="{{ mfLooptijd }}" onChange="{{ onMfLooptijd }}" style="margin-top:5px;width:100%;border:1px solid #D8D6CC;border-radius:10px;padding:9px 10px;font-size:13px;background:#fff;">
+                    <option>&lt; 1 jaar</option><option>1–5 jaar</option><option>5–10 jaar</option><option>10–20 jaar</option><option>&gt; 20 jaar</option>
+                  </select></label>
+              </div>
+              <label style="display:block;"><span style="font-size:11.5px;font-weight:700;color:#48505C;">Doel</span>
+                <select value="{{ mfDoel }}" onChange="{{ onMfDoel }}" style="margin-top:5px;width:100%;border:1px solid #D8D6CC;border-radius:10px;padding:9px 10px;font-size:13px;background:#fff;">
+                  <option>Vastgoed — verhuur/belegging</option><option>Eigen huisvesting</option><option>Werkkapitaal</option><option>Bedrijfsovername (MBI/MBO)</option><option>Groei / uitbreiding</option><option>Herfinanciering</option><option>Materieel / wagenpark</option><option>Projectontwikkeling</option><option>Start-up</option>
+                </select></label>
+              <div><span style="font-size:11.5px;font-weight:700;color:#48505C;">Beschikbare zekerheden</span>
+                <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:7px;">
+                  <sc-for list="{{ zekChips }}" as="z" hint-placeholder-count="7">
+                    <button onClick="{{ z.toggle }}" style="border:1px solid {{ z.bc }};background:{{ z.bg }};color:{{ z.fg }};border-radius:99px;padding:5px 11px;font-size:12px;font-weight:600;cursor:pointer;">{{ z.label }}</button>
+                  </sc-for>
+                </div>
+              </div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+                <label style="display:block;"><span style="font-size:11.5px;font-weight:700;color:#48505C;">Omzet (€)</span>
+                  <input value="{{ mfOmzet }}" onChange="{{ onMfOmzet }}" placeholder="2.500.000" inputMode="numeric" style="margin-top:5px;width:100%;border:1px solid #D8D6CC;border-radius:10px;padding:9px 10px;font-size:13px;background:#fff;" /></label>
+                <label style="display:block;"><span style="font-size:11.5px;font-weight:700;color:#48505C;">EBITDA (€)</span>
+                  <input value="{{ mfEbitda }}" onChange="{{ onMfEbitda }}" placeholder="400.000" inputMode="numeric" style="margin-top:5px;width:100%;border:1px solid #D8D6CC;border-radius:10px;padding:9px 10px;font-size:13px;background:#fff;" /></label>
+              </div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+                <label style="display:block;"><span style="font-size:11.5px;font-weight:700;color:#48505C;">Vastgoedwaarde (€)</span>
+                  <input value="{{ mfWaarde }}" onChange="{{ onMfWaarde }}" placeholder="alleen bij vastgoed" inputMode="numeric" style="margin-top:5px;width:100%;border:1px solid #D8D6CC;border-radius:10px;padding:9px 10px;font-size:13px;background:#fff;" /></label>
+                <div><span style="font-size:11.5px;font-weight:700;color:#48505C;">LTV</span>
+                  <div style="margin-top:5px;border:1px solid #EFEEE8;background:#FAFAF5;border-radius:10px;padding:9px 10px;font-size:13px;font-weight:700;color:#0A1B33;font-variant-numeric:tabular-nums;">{{ mfLtv }}</div></div>
+              </div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+                <label style="display:block;"><span style="font-size:11.5px;font-weight:700;color:#48505C;">Gewenste snelheid</span>
+                  <select value="{{ mfSnelheid }}" onChange="{{ onMfSnelheid }}" style="margin-top:5px;width:100%;border:1px solid #D8D6CC;border-radius:10px;padding:9px 10px;font-size:13px;background:#fff;">
+                    <option>Binnen 1 week</option><option>Binnen 1 maand</option><option>Regulier traject</option>
+                  </select></label>
+                <label style="display:block;"><span style="font-size:11.5px;font-weight:700;color:#48505C;">Risicoprofiel</span>
+                  <select value="{{ mfRisico }}" onChange="{{ onMfRisico }}" style="margin-top:5px;width:100%;border:1px solid #D8D6CC;border-radius:10px;padding:9px 10px;font-size:13px;background:#fff;">
+                    <option>Laag — sterke cijfers</option><option>Gemiddeld</option><option>Verhoogd — maatwerk</option>
+                  </select></label>
+              </div>
+              <button onClick="{{ runMatch }}" style="border:none;background:#1060FF;color:#fff;font-size:14px;font-weight:700;border-radius:10px;padding:12px;cursor:pointer;margin-top:2px;" style-hover="background:#0B4EDC;">Toon shortlist</button>
+            </div>
+          </div>
+          <div style="min-width:0;">
+            <sc-if value="{{ matchIdle }}" hint-placeholder-val="{{ true }}">
+              <div style="background:#fff;border:1px dashed #D8D6CC;border-radius:16px;padding:56px;text-align:center;margin-top:0;">
+                <div style="font-size:15px;font-weight:700;color:#0A1B33;">Nog geen shortlist</div>
+                <div style="font-size:13px;color:#67707E;margin-top:6px;max-width:420px;margin-left:auto;margin-right:auto;line-height:1.6;">Vul links de financieringsvraag in. De matching gebruikt de (deels nog te valideren) profieldata — de shortlist is indicatief en geen advies.</div>
+              </div>
+            </sc-if>
+            <div style="display:flex;flex-direction:column;gap:12px;">
+              <sc-for list="{{ matchCards }}" as="m" hint-placeholder-count="0">
+                <div style="background:#fff;border:1px solid #E4E2D8;border-radius:16px;padding:18px 20px;">
+                  <div style="display:flex;align-items:center;gap:12px;">
+                    <div style="width:34px;height:34px;flex:none;border-radius:10px;background:#0A1B33;color:#fff;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;font-variant-numeric:tabular-nums;">{{ m.rank }}</div>
+                    <div style="min-width:0;">
+                      <div style="font-size:14.5px;font-weight:800;color:#0A1B33;">{{ m.naam }}</div>
+                      <span style="display:inline-block;font-size:11px;font-weight:600;color:{{ m.typeFg }};background:{{ m.typeBg }};border-radius:99px;padding:2px 8px;margin-top:3px;">{{ m.type }}</span>
+                    </div>
+                    <div style="margin-left:auto;text-align:right;">
+                      <div style="font-size:19px;font-weight:800;color:{{ m.scoreFg }};font-variant-numeric:tabular-nums;">{{ m.score }}%</div>
+                      <div style="font-size:10.5px;font-weight:600;color:#9AA1AC;letter-spacing:.06em;text-transform:uppercase;">match</div>
+                    </div>
+                  </div>
+                  <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:14px;">
+                    <div>
+                      <div style="font-size:10.5px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:#0E7A4C;">Waarom passend</div>
+                      <div style="font-size:12.5px;color:#14202E;line-height:1.6;margin-top:4px;">{{ m.redenen }}</div>
+                    </div>
+                    <div>
+                      <div style="font-size:10.5px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:#9A5B0B;">Aandachtspunten</div>
+                      <div style="font-size:12.5px;color:#48505C;line-height:1.6;margin-top:4px;">{{ m.aandacht }}</div>
+                    </div>
+                  </div>
+                  <div style="display:flex;gap:8px;margin-top:14px;">
+                    <button onClick="{{ m.open }}" style="border:1px solid #D8D6CC;background:#fff;color:#14202E;font-size:12px;font-weight:600;border-radius:9px;padding:7px 12px;cursor:pointer;" style-hover="border-color:#1060FF;color:#1060FF;">Profiel</button>
+                    <button onClick="{{ m.addCompare }}" style="border:1px solid #D8D6CC;background:#fff;color:#14202E;font-size:12px;font-weight:600;border-radius:9px;padding:7px 12px;cursor:pointer;" style-hover="border-color:#1060FF;color:#1060FF;">+ Vergelijk</button>
+                  </div>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ isEnrich }}" hint-placeholder-val="{{ false }}">
+        <div style="display:grid;grid-template-columns:360px 1fr;gap:20px;align-items:start;">
+          <div style="display:flex;flex-direction:column;gap:14px;">
+            <div style="background:#0A1B33;color:#fff;border-radius:16px;padding:22px;">
+              <h2 style="margin:0;font-size:15px;font-weight:800;">OpenAI-koppeling</h2>
+              <div style="font-size:12px;color:#7C8DA8;margin-top:4px;line-height:1.55;">De sleutel wordt alleen lokaal in deze browser bewaard en rechtstreeks naar api.openai.com gestuurd.</div>
+              <input type="password" value="{{ apiKey }}" onChange="{{ onApiKey }}" placeholder="sk-… (alleen nodig zonder server-koppeling)" style="margin-top:14px;width:100%;border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.07);color:#fff;border-radius:10px;padding:10px 12px;font-size:13px;outline:none;" />
+              <input type="password" value="{{ appToken }}" onChange="{{ onAppToken }}" placeholder="Toegangscode team (indien ingesteld op de server)" style="margin-top:8px;width:100%;border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.07);color:#fff;border-radius:10px;padding:10px 12px;font-size:13px;outline:none;" />
+              <div style="display:flex;gap:8px;margin-top:10px;">
+                <button onClick="{{ saveKey }}" style="flex:1;border:none;background:#1060FF;color:#fff;font-size:12.5px;font-weight:700;border-radius:9px;padding:9px;cursor:pointer;" style-hover="background:#3b7bff;">Opslaan</button>
+                <button onClick="{{ testKey }}" style="flex:1;border:1px solid rgba(255,255,255,.22);background:none;color:#fff;font-size:12.5px;font-weight:600;border-radius:9px;padding:9px;cursor:pointer;" style-hover="background:rgba(255,255,255,.08);">Test verbinding</button>
+              </div>
+              <div style="font-size:12px;margin-top:10px;font-weight:600;color:{{ keyStatusColor }};">{{ keyStatus }}</div>
+              <div style="border-top:1px solid rgba(255,255,255,.1);margin-top:14px;padding-top:12px;font-size:11.5px;color:#7C8DA8;line-height:1.6;">Model: <b style="color:#DCE4EF;">{{ modelLabel }}</b> · aanpasbaar via Tweaks. Met server-koppeling worden voorstellen via <b style="color:#DCE4EF;">live webzoekopdrachten geverifieerd</b> (echte bron-URLs); zonder server valt de app terug op modelkennis en blijft alles <b style="color:#DCE4EF;">te valideren</b>.</div>
+            </div>
+            <div style="background:#fff;border:1px solid #E4E2D8;border-radius:16px;padding:20px;">
+              <h2 style="margin:0;font-size:14px;font-weight:800;color:#0A1B33;">Workflow</h2>
+              <div style="display:flex;flex-direction:column;gap:0;margin-top:12px;">
+                <div style="display:flex;gap:10px;padding:7px 0;font-size:12.5px;color:#14202E;"><span style="width:20px;height:20px;flex:none;border-radius:99px;background:#E4F3EB;color:#0E7A4C;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;">✓</span>Document geparsed (133 financiers)</div>
+                <div style="display:flex;gap:10px;padding:7px 0;font-size:12.5px;color:#14202E;"><span style="width:20px;height:20px;flex:none;border-radius:99px;background:#E4F3EB;color:#0E7A4C;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;">✓</span>Namen genormaliseerd &amp; ontdubbeld</div>
+                <div style="display:flex;gap:10px;padding:7px 0;font-size:12.5px;color:#14202E;"><span style="width:20px;height:20px;flex:none;border-radius:99px;background:#EAF0FF;color:#0B4EDC;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;">3</span>Per financier AI-voorstel genereren</div>
+                <div style="display:flex;gap:10px;padding:7px 0;font-size:12.5px;color:#14202E;"><span style="width:20px;height:20px;flex:none;border-radius:99px;background:#EAF0FF;color:#0B4EDC;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;">4</span>Bronnen controleren op de website</div>
+                <div style="display:flex;gap:10px;padding:7px 0;font-size:12.5px;color:#14202E;"><span style="width:20px;height:20px;flex:none;border-radius:99px;background:#F9EFDD;color:#9A5B0B;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;">5</span>Goedkeuren, aanpassen of afwijzen</div>
+              </div>
+            </div>
+          </div>
+          <div style="min-width:0;display:flex;flex-direction:column;gap:14px;">
+            <div style="background:#fff;border:1px solid #E4E2D8;border-radius:16px;padding:20px;">
+              <div style="display:flex;align-items:center;gap:10px;">
+                <h2 style="margin:0;font-size:15px;font-weight:800;color:#0A1B33;">Verrijken</h2>
+                <span style="font-size:12px;color:#67707E;">kies een financier en genereer een voorstel</span>
+              </div>
+              <div style="display:flex;gap:10px;margin-top:12px;">
+                <select value="{{ enrichPick }}" onChange="{{ onEnrichPick }}" style="flex:1;border:1px solid #D8D6CC;border-radius:10px;padding:10px;font-size:13px;background:#fff;">
+                  <sc-for list="{{ enrichOptions }}" as="o" hint-placeholder-count="3">
+                    <option value="{{ o.id }}">{{ o.naam }}</option>
+                  </sc-for>
+                </select>
+                <button onClick="{{ enrichNow }}" style="border:none;background:#1060FF;color:#fff;font-size:13px;font-weight:700;border-radius:10px;padding:10px 18px;cursor:pointer;white-space:nowrap;" style-hover="background:#0B4EDC;">{{ enrichBtnLabel }}</button>
+              </div>
+              <div style="font-size:11.5px;color:#67707E;margin-top:9px;line-height:1.5;">Alleen publiek beschikbare informatie wordt gevraagd; rentes zijn altijd indicatief en worden gemarkeerd totdat een adviseur ze valideert.</div>
+            </div>
+            <sc-for list="{{ enrichCards }}" as="e" hint-placeholder-count="0">
+              <div style="background:#fff;border:1px solid {{ e.border }};border-radius:16px;padding:20px;">
+                <div style="display:flex;align-items:center;gap:10px;">
+                  <div style="font-size:14.5px;font-weight:800;color:#0A1B33;">{{ e.naam }}</div>
+                  <span style="font-size:11px;font-weight:700;color:{{ e.chipFg }};background:{{ e.chipBg }};border-radius:99px;padding:3px 10px;">{{ e.chip }}</span>
+                  <span style="margin-left:auto;font-size:11px;color:#9AA1AC;">{{ e.meta }}</span>
+                </div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:2px 20px;margin-top:12px;">
+                  <sc-for list="{{ e.velden }}" as="v" hint-placeholder-count="4">
+                    <div style="display:flex;gap:8px;padding:5px 0;border-bottom:1px solid #F6F5F0;font-size:12.5px;">
+                      <span style="flex:none;width:118px;color:#9AA1AC;font-weight:600;">{{ v.k }}</span>
+                      <span style="color:#14202E;line-height:1.5;min-width:0;">{{ v.v }}</span>
+                    </div>
+                  </sc-for>
+                </div>
+                <sc-if value="{{ e.hasBronnen }}" hint-placeholder-val="{{ false }}">
+                  <div style="margin-top:10px;font-size:12px;color:#67707E;">Brons­uggesties: <span style="color:#1060FF;">{{ e.bronnen }}</span> — zelf verifiëren vóór goedkeuring.</div>
+                </sc-if>
+                <sc-if value="{{ e.pending }}" hint-placeholder-val="{{ false }}">
+                  <div style="display:flex;gap:8px;margin-top:14px;">
+                    <button onClick="{{ e.approve }}" style="border:none;background:#0E7A4C;color:#fff;font-size:12.5px;font-weight:700;border-radius:9px;padding:8px 16px;cursor:pointer;" style-hover="background:#0c6740;">Goedkeuren &amp; toepassen</button>
+                    <button onClick="{{ e.reject }}" style="border:1px solid #D8D6CC;background:#fff;color:#BE3E2B;font-size:12.5px;font-weight:600;border-radius:9px;padding:8px 16px;cursor:pointer;" style-hover="border-color:#BE3E2B;">Afwijzen</button>
+                    <span style="margin-left:auto;font-size:11.5px;color:#9AA1AC;align-self:center;">Goedkeuring zet betrouwbaarheid op “middel” tot broncontrole.</span>
+                  </div>
+                </sc-if>
+              </div>
+            </sc-for>
+            <sc-if value="{{ enrichEmpty }}" hint-placeholder-val="{{ false }}">
+              <div style="background:#fff;border:1px dashed #D8D6CC;border-radius:16px;padding:44px;text-align:center;">
+                <div style="font-size:14px;font-weight:700;color:#0A1B33;">Nog geen AI-voorstellen</div>
+                <div style="font-size:12.5px;color:#67707E;margin-top:6px;">Kies hierboven een financier en klik op “Genereer voorstel”.</div>
+              </div>
+            </sc-if>
+          </div>
+        </div>
+      </sc-if>
+    </div>
+
+    <sc-if value="{{ trayOn }}" hint-placeholder-val="{{ false }}">
+      <div style="position:fixed;left:50%;transform:translateX(-50%);width:min(860px,calc(100vw - 64px));bottom:18px;background:#0A1B33;color:#fff;border-radius:14px;padding:12px 18px;display:flex;align-items:center;gap:14px;box-shadow:0 12px 32px rgba(10,27,51,.35);z-index:40;">
+        <span style="font-size:13px;font-weight:600;">{{ trayLabel }}</span>
+        <span style="font-size:12px;color:#7C8DA8;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0;flex:1;">{{ trayNames }}</span>
+        <button onClick="{{ clearCompare }}" style="border:none;background:none;color:#7C8DA8;font-size:12px;font-weight:600;cursor:pointer;" style-hover="color:#fff;">Wis</button>
+        <button onClick="{{ goCompare }}" style="border:none;background:#1060FF;color:#fff;font-size:13px;font-weight:700;border-radius:9px;padding:8px 16px;cursor:pointer;" style-hover="background:#3b7bff;">Vergelijk</button>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ toastOn }}" hint-placeholder-val="{{ false }}">
+      <div style="position:fixed;bottom:18px;left:50%;transform:translateX(-50%);background:#14202E;color:#fff;font-size:13px;font-weight:600;border-radius:10px;padding:11px 20px;z-index:60;box-shadow:0 10px 26px rgba(0,0,0,.3);">{{ toast }}</div>
+    </sc-if>
+  </main>
+
+  <sc-if value="{{ caseModalOn }}" hint-placeholder-val="{{ false }}">
+    <div onClick="{{ closeCaseModal }}" style="position:fixed;inset:0;background:rgba(10,27,51,.5);z-index:70;"></div>
+    <div style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);width:640px;max-width:94vw;max-height:92vh;overflow-y:auto;background:#fff;border-radius:18px;z-index:71;padding:26px 28px;box-shadow:0 24px 70px rgba(10,27,51,.4);">
+      <div style="display:flex;align-items:flex-start;gap:10px;">
+        <div>
+          <h2 style="margin:0;font-size:18px;font-weight:800;color:#0A1B33;">Nieuwe casus</h2>
+          <div style="font-size:12.5px;color:#67707E;margin-top:3px;">Vul de klantvraag in — daarna genereert de AI een rapport met kansrijke financiers.</div>
+        </div>
+        <button onClick="{{ closeCaseModal }}" style="margin-left:auto;border:none;background:#F4F4EF;color:#48505C;width:30px;height:30px;border-radius:9px;cursor:pointer;font-size:16px;line-height:1;flex:none;" style-hover="background:#E9E8E0;">×</button>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:18px;">
+        <label style="display:block;"><span style="font-size:11.5px;font-weight:700;color:#48505C;">Klant / bedrijf *</span>
+          <input value="{{ cfKlant }}" onChange="{{ onCfKlant }}" placeholder="Bakkerij Jansen B.V." style="margin-top:5px;width:100%;border:1px solid #D8D6CC;border-radius:10px;padding:10px 12px;font-size:13px;background:#fff;outline-color:#1060FF;" /></label>
+        <label style="display:block;"><span style="font-size:11.5px;font-weight:700;color:#48505C;">Korte titel</span>
+          <input value="{{ cfTitel }}" onChange="{{ onCfTitel }}" placeholder="Aankoop bedrijfspand Utrecht" style="margin-top:5px;width:100%;border:1px solid #D8D6CC;border-radius:10px;padding:10px 12px;font-size:13px;background:#fff;outline-color:#1060FF;" /></label>
+        <label style="display:block;"><span style="font-size:11.5px;font-weight:700;color:#48505C;">Gevraagd bedrag (€)</span>
+          <input value="{{ cfBedrag }}" onChange="{{ onCfBedrag }}" placeholder="750.000" inputMode="numeric" style="margin-top:5px;width:100%;border:1px solid #D8D6CC;border-radius:10px;padding:10px 12px;font-size:13px;background:#fff;outline-color:#1060FF;" /></label>
+        <label style="display:block;"><span style="font-size:11.5px;font-weight:700;color:#48505C;">Type financiering</span>
+          <select value="{{ cfVorm }}" onChange="{{ onCfVorm }}" style="margin-top:5px;width:100%;border:1px solid #D8D6CC;border-radius:10px;padding:10px;font-size:13px;background:#fff;">
+            <option>Vastgoedfinanciering</option><option>Verhuurhypotheek</option><option>Bedrijfshypotheek</option><option>Werkkapitaal</option><option>Rekening-courant krediet</option><option>Overnamefinanciering</option><option>Leasing</option><option>Factoring</option><option>MKB-lening</option><option>Groeifinanciering</option><option>Achtergestelde lening</option><option>Combinatie / nog onbekend</option>
+          </select></label>
+      </div>
+      <label style="display:flex;align-items:center;gap:10px;margin-top:12px;border:1.5px dashed #C9C7BE;border-radius:12px;padding:12px 14px;cursor:pointer;background:#FBFAF6;" style-hover="border-color:#1060FF;background:#F4F7FF;">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#1060FF" stroke-width="2" style="flex:none;"><path d="M12 15V3m0 0L8 7m4-4l4 4"></path><path d="M4 17v2a2 2 0 002 2h12a2 2 0 002-2v-2"></path></svg>
+        <span style="min-width:0;">
+          <span style="display:block;font-size:12.5px;font-weight:700;color:#0A1B33;">{{ uploadLabel }}</span>
+          <span style="display:block;font-size:11.5px;color:#67707E;margin-top:1px;">PDF, Word (.docx) of tekst — de inhoud wordt aan de omschrijving toegevoegd</span>
+        </span>
+        <input type="file" accept=".pdf,.docx,.txt,.md,.rtf,.csv" onChange="{{ uploadModalFile }}" style="display:none;" />
+      </label>
+      <label style="display:block;margin-top:12px;"><span style="font-size:11.5px;font-weight:700;color:#48505C;">Casusomschrijving *</span>
+        <textarea value="{{ cfTekst }}" onChange="{{ onCfTekst }}" rows="7" placeholder="Beschrijf de klant en de vraag zo volledig mogelijk: activiteiten, omzet en EBITDA, gevraagd bedrag en doel, eigen inbreng, zekerheden (vastgoedwaarde, overwaarde), gewenste snelheid en bijzonderheden…" style="margin-top:5px;width:100%;border:1px solid #D8D6CC;border-radius:12px;padding:12px 14px;font-size:13px;line-height:1.6;background:#fff;resize:vertical;outline-color:#1060FF;"></textarea></label>
+      <div style="font-size:11.5px;color:#9AA1AC;margin-top:8px;line-height:1.5;">Hoe vollediger de omschrijving, hoe scherper de AI-analyse. De casus wordt alleen lokaal in deze browser opgeslagen.</div>
+      <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:18px;">
+        <button onClick="{{ closeCaseModal }}" style="border:1px solid #D8D6CC;background:#fff;color:#48505C;font-size:13px;font-weight:600;border-radius:10px;padding:10px 16px;cursor:pointer;" style-hover="border-color:#9AA1AC;">Annuleren</button>
+        <button onClick="{{ saveCase }}" style="border:none;background:#1060FF;color:#fff;font-size:13px;font-weight:700;border-radius:10px;padding:10px 20px;cursor:pointer;" style-hover="background:#0B4EDC;">Casus aanmaken</button>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ detailOn }}" hint-placeholder-val="{{ false }}">
+    <div onClick="{{ closeDetail }}" style="position:fixed;inset:0;background:rgba(10,27,51,.42);z-index:50;"></div>
+    <div style="position:fixed;top:0;right:0;bottom:0;width:520px;max-width:92vw;background:#fff;z-index:51;box-shadow:-18px 0 50px rgba(10,27,51,.25);display:flex;flex-direction:column;">
+      <div style="flex:none;padding:22px 26px 16px;border-bottom:1px solid #EFEEE8;display:flex;align-items:flex-start;gap:12px;">
+        <div style="min-width:0;">
+          <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+            <h2 style="margin:0;font-size:19px;font-weight:800;letter-spacing:-.01em;color:#0A1B33;">{{ d.naam }}</h2>
+            <sc-if value="{{ d.isPP }}" hint-placeholder-val="{{ false }}"><span style="font-size:10.5px;font-weight:700;color:#7A5E14;background:#F6EED6;border:1px solid #E3D5A6;border-radius:99px;padding:2px 8px;">Preferred Partner</span></sc-if>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px;margin-top:7px;flex-wrap:wrap;">
+            <span style="font-size:11.5px;font-weight:600;color:{{ d.typeFg }};background:{{ d.typeBg }};border-radius:99px;padding:3px 10px;">{{ d.type }}</span>
+            <span style="font-size:11.5px;font-weight:600;color:{{ d.statusFg }};display:flex;align-items:center;gap:5px;"><span style="width:7px;height:7px;border-radius:99px;background:{{ d.statusFg }};"></span>{{ d.statusText }}</span>
+          </div>
+        </div>
+        <button onClick="{{ closeDetail }}" style="margin-left:auto;border:none;background:#F4F4EF;color:#48505C;width:30px;height:30px;border-radius:9px;cursor:pointer;font-size:16px;line-height:1;" style-hover="background:#E9E8E0;">×</button>
+      </div>
+      <div style="flex:1;overflow-y:auto;padding:20px 26px 30px;">
+        <div style="display:flex;gap:8px;">
+          <button onClick="{{ d.enrich }}" style="border:none;background:#1060FF;color:#fff;font-size:12.5px;font-weight:700;border-radius:9px;padding:9px 14px;cursor:pointer;" style-hover="background:#0B4EDC;">Verrijk met AI</button>
+          <button onClick="{{ d.addCompare }}" style="border:1px solid #D8D6CC;background:#fff;color:#14202E;font-size:12.5px;font-weight:600;border-radius:9px;padding:9px 14px;cursor:pointer;" style-hover="border-color:#1060FF;color:#1060FF;">+ Vergelijken</button>
+        </div>
+        <div style="margin-top:22px;">
+          <div style="font-size:11px;font-weight:800;letter-spacing:.09em;text-transform:uppercase;color:#1060FF;">Documenten van de financier</div>
+          <div style="font-size:11.5px;color:#9AA1AC;margin-top:4px;line-height:1.5;">Upload productsheets, voorwaarden of tarievenkaarten — de AI verwerkt ze tot profieldata (betrouwbaarheid “hoog” na goedkeuring).</div>
+          <sc-for list="{{ d.docs }}" as="doc" hint-placeholder-count="0">
+            <div style="display:flex;align-items:center;gap:10px;border:1px solid #EFEEE8;border-radius:10px;padding:9px 13px;margin-top:8px;background:#FBFAF6;font-size:12.5px;">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#1060FF" stroke-width="2" style="flex:none;"><path d="M14 3H7a2 2 0 00-2 2v14a2 2 0 002 2h10a2 2 0 002-2V8z"></path><path d="M14 3v5h5"></path></svg>
+              <span style="min-width:0;color:#0A1B33;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">{{ doc.naam }}</span>
+              <span style="margin-left:auto;flex:none;font-size:10.5px;color:#9AA1AC;">{{ doc.ts }} · {{ doc.omvang }}</span>
+              <button onClick="{{ doc.del }}" style="flex:none;border:none;background:none;color:#9AA1AC;cursor:pointer;font-size:14px;line-height:1;padding:2px;" style-hover="color:#BE3E2B;">×</button>
+            </div>
+          </sc-for>
+          <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap;">
+            <label style="display:flex;align-items:center;gap:8px;border:1.5px dashed #C9C7BE;background:#FBFAF6;color:#0A1B33;font-size:12px;font-weight:700;border-radius:10px;padding:9px 14px;cursor:pointer;" style-hover="border-color:#1060FF;background:#F4F7FF;">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#1060FF" stroke-width="2"><path d="M12 15V3m0 0L8 7m4-4l4 4"></path><path d="M4 17v2a2 2 0 002 2h12a2 2 0 002-2v-2"></path></svg>
+              {{ uploadDocLabel }}
+              <input type="file" accept=".pdf,.docx,.txt,.md,.rtf,.csv" onChange="{{ uploadFinDoc }}" style="display:none;" />
+            </label>
+            <sc-if value="{{ dHasDocs }}" hint-placeholder-val="{{ false }}">
+              <button onClick="{{ d.enrichFromDocs }}" style="border:none;background:#0E7A4C;color:#fff;font-size:12px;font-weight:700;border-radius:10px;padding:9px 14px;cursor:pointer;" style-hover="background:#0c6740;">{{ docExtractLabel }}</button>
+            </sc-if>
+          </div>
+        </div>
+        <sc-for list="{{ d.secties }}" as="s" hint-placeholder-count="4">
+          <div style="margin-top:22px;">
+            <div style="font-size:11px;font-weight:800;letter-spacing:.09em;text-transform:uppercase;color:#1060FF;">{{ s.titel }}</div>
+            <div style="border:1px solid #EFEEE8;border-radius:12px;margin-top:8px;overflow:hidden;">
+              <sc-for list="{{ s.velden }}" as="v" hint-placeholder-count="4">
+                <div style="display:flex;gap:12px;padding:9px 14px;border-bottom:1px solid #F6F5F0;background:#fff;font-size:12.5px;">
+                  <span style="flex:none;width:150px;color:#9AA1AC;font-weight:600;">{{ v.k }}</span>
+                  <span style="color:{{ v.fg }};line-height:1.55;min-width:0;font-style:{{ v.fs }};">{{ v.v }}</span>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+        </sc-for>
+        <div style="margin-top:22px;">
+          <div style="font-size:11px;font-weight:800;letter-spacing:.09em;text-transform:uppercase;color:#1060FF;">Notities van adviseurs</div>
+          <sc-for list="{{ d.notes }}" as="n" hint-placeholder-count="0">
+            <div style="border:1px solid #EFEEE8;border-radius:10px;padding:10px 14px;margin-top:8px;background:#FBFAF6;">
+              <div style="font-size:12.5px;color:#14202E;line-height:1.55;">{{ n.text }}</div>
+              <div style="font-size:10.5px;color:#9AA1AC;margin-top:4px;">{{ n.date }}</div>
+            </div>
+          </sc-for>
+          <div style="display:flex;gap:8px;margin-top:10px;">
+            <input value="{{ noteDraft }}" onChange="{{ onNoteDraft }}" placeholder="Voeg een notitie toe…" style="flex:1;border:1px solid #D8D6CC;border-radius:10px;padding:9px 12px;font-size:13px;background:#fff;" />
+            <button onClick="{{ addNote }}" style="border:none;background:#0A1B33;color:#fff;font-size:12.5px;font-weight:700;border-radius:9px;padding:9px 16px;cursor:pointer;" style-hover="background:#122c50;">Opslaan</button>
+          </div>
+        </div>
+        <sc-if value="{{ dHasUitkomsten }}" hint-placeholder-val="{{ false }}">
+          <div style="margin-top:22px;">
+            <div style="font-size:11px;font-weight:800;letter-spacing:.09em;text-transform:uppercase;color:#1060FF;">Track record via Credion</div>
+            <div style="display:flex;flex-direction:column;gap:6px;margin-top:8px;">
+              <sc-for list="{{ d.uitkomsten }}" as="u" hint-placeholder-count="0">
+                <div style="display:flex;align-items:center;gap:8px;border:1px solid #EFEEE8;border-radius:10px;padding:8px 12px;background:#FBFAF6;font-size:12px;">
+                  <b style="flex:none;color:{{ u.fg }};">{{ u.resultaat }}</b>
+                  <span style="flex:none;color:#0A1B33;font-weight:600;">{{ u.casus }}</span>
+                  <span style="color:#48505C;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">{{ u.reden }}</span>
+                  <span style="margin-left:auto;flex:none;font-size:10.5px;color:#9AA1AC;">{{ u.ts }}</span>
+                </div>
+              </sc-for>
+            </div>
+            <div style="font-size:11px;color:#9AA1AC;margin-top:6px;">Deze uitkomsten wegen automatisch mee in matching en AI-rapporten.</div>
+          </div>
+        </sc-if>
+        <div style="margin-top:22px;background:#FBFAF6;border:1px solid #EFEEE8;border-radius:12px;padding:12px 14px;font-size:11.5px;color:#67707E;line-height:1.6;">
+          Laatst gecontroleerd: <b style="color:#14202E;">{{ d.gecontroleerd }}</b> · Betrouwbaarheid: <b style="color:{{ d.betrFg }};">{{ d.betrouwbaarheid }}</b><br>Rentes en voorwaarden zijn indicatief en kunnen wijzigen; raadpleeg altijd de bron vóór advies.
+        </div>
+      </div>
+    </div>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;aiModel&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;gpt-4.1&quot;,&quot;gpt-5&quot;,&quot;gpt-4o&quot;,&quot;gpt-4.1-mini&quot;],&quot;default&quot;:&quot;gpt-4.1&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;AI-verrijking&quot;},&quot;demoModus&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;AI-verrijking&quot;},&quot;dichtheid&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;comfortabel&quot;,&quot;compact&quot;],&quot;default&quot;:&quot;comfortabel&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Weergave&quot;}}">
+class Component extends DCLogic {
+  state = {
+    base: [], view: 'dashboard', search: '', fType: '', fVorm: '', fBank: '', fLabel: '', fData: '',
+    detailId: null, compare: [], noteDraft: '', apiKey: '', appToken: '', keyStatus: '', keyOk: null,
+    enrich: {}, overrides: {}, notes: {}, enrichPick: '', busy: false, toast: '',
+    mf: { vorm: 'Vastgoedfinanciering', bedrag: '', looptijd: '5–10 jaar', doel: 'Vastgoed — verhuur/belegging', zek: [], omzet: '', ebitda: '', waarde: '', snelheid: 'Regulier traject', risico: 'Gemiddeld' },
+    matchResults: null, reportBusy: false,
+    cases: [], caseId: null, caseModal: false,
+    cf: { klant: '', titel: '', bedrag: '', vorm: 'Vastgoedfinanciering', tekst: '' },
+    uploadBusy: false,
+    reportStep: '', kfBusy: false, uf: { fid: '', resultaat: 'Gefinancierd', reden: '' }, storeOn: false,
+    docs: {}, docBusy: false,
+  };
+  async uploadCasus(e, target) {
+    const file = e.target.files && e.target.files[0];
+    e.target.value = '';
+    if (!file) return;
+    if (file.size > 15 * 1024 * 1024) return this.showToast('Bestand te groot (max 15 MB)');
+    this.setState({ uploadBusy: true });
+    try {
+      const mod = await import('./lib/parse-file.js');
+      let text = await mod.extractText(file);
+      if (!text || text.length < 20) throw new Error('geen leesbare tekst gevonden (gescande PDF?)');
+      if (text.length > 60000) text = text.slice(0, 60000) + '\n[… document ingekort tot 60.000 tekens]';
+      const kop = '[Document: ' + file.name + ']\n';
+      if (target === 'case') {
+        const c = this.currentCase();
+        if (c) this.updateCase(c.id, { tekst: (c.tekst + '\n\n' + kop + text).trim() });
+      } else {
+        this.setState({ cf: Object.assign({}, this.state.cf, { tekst: (this.state.cf.tekst + '\n\n' + kop + text).trim() }) });
+      }
+      this.setState({ uploadBusy: false });
+      this.showToast('Document gelezen: ' + file.name + ' (' + text.length.toLocaleString('nl-NL') + ' tekens)');
+    } catch (err) {
+      this.setState({ uploadBusy: false });
+      this.showToast('Lezen mislukt: ' + err.message);
+    }
+  }
+  casusTekstVoorAi(c) {
+    const kop = ['Klant: ' + c.klant, c.titel ? 'Casus: ' + c.titel : null, c.bedrag ? 'Gevraagd bedrag: € ' + c.bedrag : null, c.vorm ? 'Type financiering: ' + c.vorm : null].filter(Boolean).join('\n');
+    return kop + '\n\n' + c.tekst;
+  }
+  async analyseKengetallen(silent) {
+    const c = this.currentCase();
+    if (!c || this.state.kfBusy) return null;
+    if (!this.state.apiKey.trim() && !this.state.serverAi) { this.setState({ view: 'enrich' }); this.showToast('Geen server-koppeling — voeg je OpenAI API-sleutel toe'); return null; }
+    this.setState({ kfBusy: true });
+    try {
+      const mod = await import('./lib/extract-financials.js');
+      const kengetallen = await mod.extractKengetallen({ chat: b => this.aiChat(b), model: this.model(), casus: this.casusTekstVoorAi(c) });
+      this.updateCase(c.id, { kengetallen });
+      this.setState({ kfBusy: false });
+      if (!silent) this.showToast('Kengetallen geëxtraheerd — controleer ze vóór het rapport');
+      return kengetallen;
+    } catch (e) {
+      this.setState({ kfBusy: false });
+      if (!silent) this.showToast('Kengetallen mislukt: ' + e.message);
+      return null;
+    }
+  }
+  async genReport() {
+    const c = this.currentCase();
+    if (!c) return;
+    if (!this.state.apiKey.trim() && !this.state.serverAi) { this.setState({ view: 'enrich' }); return this.showToast('Geen server-koppeling — voeg je OpenAI API-sleutel toe'); }
+    if (this.state.reportBusy) return;
+    this.setState({ reportBusy: true, reportStep: 'Voorbereiden…' });
+    try {
+      const [repMod, engMod] = await Promise.all([import('./lib/generate-report.js'), import('./lib/match-engine.js')]);
+      // Stap 0: kengetallen (hergebruik indien al geëxtraheerd voor deze casustekst)
+      let kengetallen = c.kengetallen || null;
+      if (!kengetallen) {
+        this.setState({ reportStep: 'Kengetallen extraheren…' });
+        kengetallen = await this.analyseKengetallen(true);
+      }
+      // Stap 1: deterministische voorselectie + feedback-loop
+      const fs = this.merged();
+      const uitkomsten = engMod.outcomesFromCases(this.state.cases);
+      const kandidaten = engMod.preselectForReport(fs, c, kengetallen, uitkomsten, 22);
+      const uitkomstenText = engMod.outcomesSummaryText(fs, uitkomsten);
+      // Stap 2: AI-rapport in twee fasen
+      const report = await repMod.generateReport({
+        chat: b => this.aiChat(b), model: this.model(),
+        casus: this.casusTekstVoorAi(c), financiers: fs,
+        kandidaten, kengetallen, uitkomstenText,
+        onStep: t => this.setState({ reportStep: t }),
+      });
+      const cur = this.currentCase();
+      this.updateCase((cur || c).id, { report });
+      this.setState({ reportBusy: false, reportStep: '' });
+      this.showToast('Rapport gereed (' + kandidaten.length + ' van ' + fs.length + ' kandidaten beoordeeld) — concept, valideren vóór gebruik');
+    } catch (e) {
+      this.setState({ reportBusy: false, reportStep: '' });
+      this.showToast('Rapport mislukt: ' + e.message);
+    }
+  }
+  addUitkomst() {
+    const c = this.currentCase(), u = this.state.uf;
+    if (!c || !u.fid) return this.showToast('Kies eerst een financier');
+    const lijst = (c.uitkomsten || []).concat([{ fid: u.fid, resultaat: u.resultaat, reden: u.reden.trim(), ts: new Date().toLocaleDateString('nl-NL') }]);
+    this.updateCase(c.id, { uitkomsten: lijst });
+    this.setState({ uf: { fid: '', resultaat: 'Gefinancierd', reden: '' } });
+    this.showToast('Uitkomst vastgelegd — telt voortaan mee in matching en rapporten');
+  }
+  delUitkomst(i) {
+    const c = this.currentCase();
+    if (!c) return;
+    const lijst = (c.uitkomsten || []).slice();
+    lijst.splice(i, 1);
+    this.updateCase(c.id, { uitkomsten: lijst });
+  }
+  currentCase() { return this.state.cases.find(x => x.id === this.state.caseId) || null; }
+  updateCase(id, patch) {
+    const cases = this.state.cases.map(c => c.id === id ? Object.assign({}, c, patch) : c);
+    this.setState({ cases });
+    this.persist('cfp_cases', cases);
+  }
+  saveCase() {
+    const f = this.state.cf;
+    if (!f.klant.trim()) return this.showToast('Vul de klant/bedrijfsnaam in');
+    if (f.tekst.trim().length < 20) return this.showToast('Omschrijf de casus iets uitgebreider');
+    const c = { id: 'c' + Date.now(), klant: f.klant.trim(), titel: f.titel.trim(), bedrag: f.bedrag.trim(), vorm: f.vorm, tekst: f.tekst.trim(), status: 'Intake', created: new Date().toLocaleDateString('nl-NL'), report: null };
+    const cases = [c].concat(this.state.cases);
+    this.setState({ cases, caseModal: false, caseId: c.id, view: 'cases', cf: { klant: '', titel: '', bedrag: '', vorm: 'Vastgoedfinanciering', tekst: '' } });
+    this.persist('cfp_cases', cases);
+    this.showToast('Casus aangemaakt — genereer nu het AI-rapport');
+  }
+  deleteCase(id) {
+    if (!window.confirm('Casus definitief verwijderen (inclusief rapport)?')) return;
+    const cases = this.state.cases.filter(c => c.id !== id);
+    this.setState({ cases, caseId: null });
+    this.persist('cfp_cases', cases);
+    this.showToast('Casus verwijderd');
+  }
+  exportBackup() {
+    const d = { app: 'credion-financiersplatform', versie: 2, datum: new Date().toISOString(), cases: this.state.cases, enrich: this.state.enrich, overrides: this.state.overrides, notes: this.state.notes, docs: this.state.docs };
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(new Blob([JSON.stringify(d, null, 1)], { type: 'application/json' }));
+    a.download = 'credion-backup-' + new Date().toISOString().slice(0, 10) + '.json';
+    a.click();
+    this.showToast('Back-up gedownload (casussen, verrijkingen, notities)');
+  }
+  importBackup(e) {
+    const file = e.target.files && e.target.files[0];
+    if (!file) return;
+    const rd = new FileReader();
+    rd.onload = () => {
+      try {
+        const d = JSON.parse(rd.result);
+        if (!d || d.app !== 'credion-financiersplatform') throw new Error('geen geldig back-upbestand');
+        const patch = { cases: d.cases || [], enrich: d.enrich || {}, overrides: d.overrides || {}, notes: d.notes || {}, docs: d.docs || {} };
+        this.setState(patch);
+        this.persist('cfp_cases', patch.cases); this.persist('cfp_enrich', patch.enrich); this.persist('cfp_overrides', patch.overrides); this.persist('cfp_notes', patch.notes); this.persist('cfp_docs', patch.docs);
+        this.showToast('Back-up hersteld: ' + patch.cases.length + ' casussen, ' + Object.keys(patch.overrides).length + ' verrijkte profielen');
+      } catch (err) { this.showToast('Herstellen mislukt: ' + err.message); }
+    };
+    rd.readAsText(file);
+    e.target.value = '';
+  }
+  buildReportHtml() {
+    const c = this.currentCase();
+    if (!c || !c.report) return null;
+    const r = c.report, fs = this.merged();
+    const esc = v => String(v == null ? '' : v).replace(/&/g, '&amp;').replace(/</g, '&lt;');
+    const li = a => (a || []).map(x => '<li>' + esc(x) + '</li>').join('');
+    const cards = (r.shortlist || []).map((m, i) => {
+      const f = fs.find(x => x.id === m.id) || { naam: m.id };
+      const extra = [['Rente-indicatie', m.renteIndicatie], ['Verwachte voorwaarden', m.verwachteVoorwaarden], ['Doorlooptijd', m.doorlooptijd], ['Benodigde documenten', m.benodigdeDocumenten]].filter(x => x[1]).map(x => '<p><b>' + x[0] + ':</b> ' + esc(x[1]) + '</p>').join('');
+      return '<div class="m"><h3>' + (i + 1) + '. ' + esc(f.naam) + ' <span class="k">kans ' + esc(m.kans) + ' · ' + Math.round(m.score || 0) + '%</span></h3><p><b>Motivatie:</b> ' + esc(m.motivatie) + '</p><p><b>Aandachtspunten:</b> ' + esc(m.aandachtspunten) + '</p><p><b>Indicatieve structuur:</b> ' + esc(m.indicatieveStructuur) + '</p>' + extra + '</div>';
+    }).join('');
+    const an = r.casusAnalyse || {};
+    const kern = (an.kerngegevens || []).map(k => '<b>' + esc(k.label) + ':</b> ' + esc(k.waarde)).join(' · ');
+    const afv = (r.afvallers || []).map(a => { const f = fs.find(x => x.id === a.id) || { naam: a.id }; return '<li><b>' + esc(f.naam) + '</b> — ' + esc(a.reden) + '</li>'; }).join('');
+    const html = '<!DOCTYPE html><html><head><meta charset="utf-8"><title>Financieringsrapport — ' + esc(c.klant) + '</title><style>@page{margin:2cm}body{font-family:Archivo,Arial,sans-serif;color:#14202E;max-width:760px;margin:0 auto;padding:24px;font-size:13px;line-height:1.6}h1{font-size:22px;margin:0;color:#0A1B33}h2{font-size:15px;color:#0A1B33;margin:26px 0 8px;border-bottom:2px solid #1060FF;padding-bottom:4px}h3{font-size:13.5px;margin:0 0 6px}.sub{color:#67707E;font-size:12px;margin-top:4px}.m{border:1px solid #ddd;border-radius:10px;padding:12px 16px;margin:10px 0;page-break-inside:avoid}.m p{margin:4px 0}.k{font-weight:700;color:#0B4EDC;font-size:12px}.kern{background:#f6f6f1;border-radius:8px;padding:8px 12px;font-size:12px}.disc{background:#f6f6f1;border-radius:8px;padding:10px 14px;color:#67707E;font-size:11px;margin-top:24px}ul{margin:6px 0;padding-left:20px}</style></head><body>' +
+      '<h1>Financieringsrapport</h1><div class="sub">' + esc(c.klant) + (c.titel ? ' — ' + esc(c.titel) : '') + ' · ' + esc((r._meta || {}).ts || '') + ' · Concept, te valideren door adviseur</div>' +
+      '<h2>Samenvatting</h2><p>' + esc(r.samenvatting) + '</p>' +
+      '<h2>Casusanalyse</h2><p>' + esc([an.gevraagd, an.doel].filter(Boolean).join(' — ')) + (an.ratios ? '<br>' + esc(an.ratios) : '') + '</p>' +
+      (an.ondernemingsprofiel ? '<p>' + esc(an.ondernemingsprofiel) + (an.zekerhedenpositie ? ' ' + esc(an.zekerhedenpositie) : '') + '</p>' : '') +
+      (kern ? '<p class="kern">' + kern + '</p>' : '') +
+      '<p><b>Sterktes</b></p><ul>' + li(an.sterktes) + '</ul><p><b>Risico\'s</b></p><ul>' + li(an.risicos) + '</ul>' +
+      '<h2>Kansrijke financiers</h2>' + cards +
+      (afv ? '<h2>Bewust niet voorgesteld</h2><ul>' + afv + '</ul>' : '') +
+      ((r.alternatieveRoutes || []).length ? '<h2>Alternatieve routes</h2><ul>' + li(r.alternatieveRoutes) + '</ul>' : '') +
+      ((r.onderhandelingstips || []).length ? '<h2>Onderhandelingstips</h2><ul>' + li(r.onderhandelingstips) + '</ul>' : '') +
+      '<h2>Vervolgstappen</h2><ul>' + li(r.vervolgstappen) + '</ul>' +
+      '<div class="disc">' + esc(r.disclaimer) + '</div></body></html>';
+    return html;
+  }
+  printReport() {
+    const html = this.buildReportHtml();
+    if (!html) return;
+    const w = window.open('', '_blank');
+    if (!w) return this.showToast('Pop-up geblokkeerd — sta pop-ups toe om te printen');
+    w.document.write(html);
+    w.document.close();
+    setTimeout(() => { w.focus(); w.print(); }, 500);
+  }
+  exportWord() {
+    const c = this.currentCase();
+    const html = this.buildReportHtml();
+    if (!html) return;
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(new Blob(['﻿' + html], { type: 'application/msword' }));
+    a.download = 'financieringsrapport-' + (c.klant || 'casus').toLowerCase().replace(/[^a-z0-9]+/g, '-') + '-' + new Date().toISOString().slice(0, 10) + '.doc';
+    a.click();
+    this.showToast('Word-document gedownload — opent direct in Word');
+  }
+  componentDidMount() {
+    import('./data/financiers-data.js').then(m => this.setState({ base: m.FINANCIERS }));
+    try {
+      this.setState({
+        apiKey: localStorage.getItem('cfp_key') || '',
+        appToken: localStorage.getItem('cfp_apptoken') || '',
+        enrich: JSON.parse(localStorage.getItem('cfp_enrich') || '{}'),
+        overrides: JSON.parse(localStorage.getItem('cfp_overrides') || '{}'),
+        notes: JSON.parse(localStorage.getItem('cfp_notes') || '{}'),
+        docs: JSON.parse(localStorage.getItem('cfp_docs') || '{}'),
+      });
+      let cases = JSON.parse(localStorage.getItem('cfp_cases') || '[]');
+      const rep = JSON.parse(localStorage.getItem('cfp_report') || 'null');
+      if (!cases.length && rep && rep.report) {
+        cases = [{ id: 'c' + Date.now(), klant: 'Eerdere casus', titel: 'Overgenomen uit vorige sessie', bedrag: '', vorm: '', tekst: rep.casus || '', status: 'Intake', created: new Date().toLocaleDateString('nl-NL'), report: rep.report }];
+        localStorage.setItem('cfp_cases', JSON.stringify(cases));
+      }
+      this.setState({ cases });
+      fetch('/api/ai').then(r => {
+        const ct = r.headers.get('content-type') || '';
+        if (ct.includes('application/json')) return r.json().then(j => { if (j && (j.ok || j.error)) this.setState({ serverAi: true, authRequired: !!j.auth }); });
+      }).catch(() => {});
+      this.loadRemote();
+    } catch (e) {}
+  }
+  // ---- Gedeelde teamopslag (optioneel, via /api/store + Supabase) ----
+  apiHeaders() {
+    const h = { 'Content-Type': 'application/json' };
+    if (this.state.appToken.trim()) h['x-app-token'] = this.state.appToken.trim();
+    return h;
+  }
+  async loadRemote() {
+    try {
+      const r = await fetch('/api/store?key=main', { headers: this.apiHeaders() });
+      if (!(r.headers.get('content-type') || '').includes('application/json')) return;
+      const j = await r.json();
+      if (!j || !j.store) return;
+      this.setState({ storeOn: true });
+      if (j.value && typeof j.value === 'object') {
+        const v = j.value;
+        const patch = { cases: v.cases || [], enrich: v.enrich || {}, overrides: v.overrides || {}, notes: v.notes || {}, docs: v.docs || {} };
+        // Server is de gedeelde waarheid; lokale kopie bijwerken.
+        this.setState(patch);
+        try {
+          localStorage.setItem('cfp_cases', JSON.stringify(patch.cases));
+          localStorage.setItem('cfp_enrich', JSON.stringify(patch.enrich));
+          localStorage.setItem('cfp_overrides', JSON.stringify(patch.overrides));
+          localStorage.setItem('cfp_notes', JSON.stringify(patch.notes));
+          localStorage.setItem('cfp_docs', JSON.stringify(patch.docs));
+        } catch (e) {}
+        this.showToast('Gedeelde teamdata geladen (' + patch.cases.length + ' casussen)');
+      }
+    } catch (e) {}
+  }
+  schedulePush() {
+    if (!this.state.storeOn) return;
+    clearTimeout(this._push);
+    this._push = setTimeout(() => this.pushRemote(), 1500);
+  }
+  async pushRemote() {
+    if (!this.state.storeOn) return;
+    try {
+      const s = this.state;
+      await fetch('/api/store', {
+        method: 'POST', headers: this.apiHeaders(),
+        body: JSON.stringify({ key: 'main', value: { cases: s.cases, enrich: s.enrich, overrides: s.overrides, notes: s.notes, docs: s.docs, datum: new Date().toISOString() } }),
+      });
+    } catch (e) {}
+  }
+  persist(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} this.schedulePush(); }
+  async aiChat(body) {
+    try {
+      const r = await fetch('/api/ai', { method: 'POST', headers: this.apiHeaders(), body: JSON.stringify(body) });
+      const ct = r.headers.get('content-type') || '';
+      if (ct.includes('application/json')) {
+        const j = await r.json();
+        if (r.ok && j && j.choices) { if (!this.state.serverAi) this.setState({ serverAi: true }); return j; }
+        if (r.status === 401) throw new Error('Server: toegangscode ontbreekt of onjuist — vul deze in onder AI-verrijking');
+        if (r.status === 429) throw new Error('Server: rate limit bereikt — probeer het later opnieuw');
+        if (j && j.error && r.status !== 405) throw new Error('Server: ' + (j.error.message || j.error));
+      }
+    } catch (e) { if (String(e.message).startsWith('Server:')) throw e; }
+    const key = this.state.apiKey.trim();
+    if (!key) throw new Error('Geen server-koppeling (/api/ai) en geen lokale API-sleutel');
+    const r = await fetch('https://api.openai.com/v1/chat/completions', { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + key }, body: JSON.stringify(body) });
+    if (!r.ok) { const t = await r.text(); throw new Error('OpenAI ' + r.status + ': ' + t.slice(0, 140)); }
+    return r.json();
+  }
+  showToast(msg) {
+    clearTimeout(this._tt);
+    this.setState({ toast: msg });
+    this._tt = setTimeout(() => this.setState({ toast: '' }), 2600);
+  }
+  merged() {
+    return this.state.base.map(f => Object.assign({}, f, this.state.overrides[f.id] || {}));
+  }
+  typeColors(type) {
+    const map = {
+      'Bank': ['#0B4EDC', '#EAF0FF'], 'Non-bank lender': ['#4A5568', '#EFEEE8'],
+      'Factoringmaatschappij': ['#7C3AED', '#F1EAFB'], 'Leasemaatschappij': ['#0E7A4C', '#E4F3EB'],
+      'Crowdfundingplatform': ['#B45309', '#F9EFDD'], 'Vastgoedfinancier': ['#0F6E8C', '#E3F1F6'],
+      'Investeerder / fonds': ['#8A6D1F', '#F6EED6'], 'Overheidsregeling / stichting': ['#3D5A2E', '#EAF2E3'],
+      'Kredietkaart / betaaloplossing': ['#874C62', '#F7E9EF'],
+    };
+    return map[type] || ['#4A5568', '#EFEEE8'];
+  }
+  statusOf(f) {
+    const e = this.state.enrich[f.id];
+    if (e && e.status === 'approved') return ['Gevalideerd', '#0E7A4C', 'valid'];
+    if (e && e.status === 'pending') return ['AI-voorstel', '#0B4EDC', 'ai'];
+    return ['Validatie nodig', '#9A5B0B', 'todo'];
+  }
+  fmtEur(n) { return n == null ? null : '€ ' + Number(n).toLocaleString('nl-NL'); }
+  num(s) { return parseFloat(String(s).replace(/[^\d]/g, '')) || 0; }
+  setView(v) { this.setState({ view: v, matchIdleKeep: true }); }
+  openDetail(id) { this.setState({ detailId: id, noteDraft: '' }); }
+  toggleCompare(id) {
+    const c = this.state.compare.slice();
+    const i = c.indexOf(id);
+    if (i >= 0) c.splice(i, 1);
+    else if (c.length >= 4) return this.showToast('Maximaal 4 financiers vergelijken');
+    else c.push(id);
+    this.setState({ compare: c });
+  }
+  exportCsv() {
+    const fs = this.merged();
+    const cols = ['naam','type','status','vormen','doelgroep','sectorFocus','minBedrag','maxBedrag','rente','kosten','looptijd','aflossing','zekerheden','ltv','dscr','eigenInbreng','acceptatie','snelheid','documenten','bijzonderheden','adres','telefoon','email','kvk','website','labels','betrouwbaarheid','dataStatus','laatstGecontroleerd','bronnen'];
+    const esc = v => { const s = Array.isArray(v) ? v.join(' | ') : (v == null ? '' : String(v)); return '"' + s.replace(/"/g, '""') + '"'; };
+    const csv = '\uFEFF' + cols.join(';') + '\n' + fs.map(f => cols.map(c => esc(f[c])).join(';')).join('\n');
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8' }));
+    a.download = 'credion-financiers-' + new Date().toISOString().slice(0, 10) + '.csv';
+    a.click();
+    this.showToast('CSV geëxporteerd (' + fs.length + ' financiers)');
+  }
+  async testKey() {
+    const key = this.state.apiKey.trim();
+    this.setState({ keyStatus: 'Verbinding testen…', keyOk: null });
+    try {
+      const r = await fetch('/api/ai');
+      const ct = r.headers.get('content-type') || '';
+      if (ct.includes('application/json')) {
+        const j = await r.json();
+        if (j && (j.ok || j.error)) { this.setState({ serverAi: true }); return this.setState({ keyStatus: 'Server-koppeling actief (/api/ai) — sleutel via environment variable, geen lokale sleutel nodig.', keyOk: true }); }
+      }
+    } catch (e) {}
+    if (!key) return this.setState({ keyStatus: 'Geen server-koppeling gevonden en geen lokale sleutel ingevuld.', keyOk: false });
+    try {
+      const r = await fetch('https://api.openai.com/v1/models', { headers: { Authorization: 'Bearer ' + key } });
+      if (r.ok) this.setState({ keyStatus: 'Verbonden — sleutel werkt.', keyOk: true });
+      else this.setState({ keyStatus: 'Fout ' + r.status + ' — controleer de sleutel.', keyOk: false });
+    } catch (e) { this.setState({ keyStatus: 'Netwerkfout: ' + e.message, keyOk: false }); }
+  }
+  saveKey() {
+    try {
+      localStorage.setItem('cfp_key', this.state.apiKey.trim());
+      localStorage.setItem('cfp_apptoken', this.state.appToken.trim());
+    } catch (e) {}
+    this.setState({ keyStatus: 'Opgeslagen.', keyOk: this.state.apiKey.trim() ? true : null });
+    this.showToast('Instellingen opgeslagen (alleen in deze browser)');
+    this.loadRemote();
+  }
+  model() { return this.props.aiModel ?? 'gpt-4.1'; }
+  async enrichOne(id) {
+    const f = this.merged().find(x => x.id === id);
+    if (!f || this.state.busy) return;
+    if (!this.state.apiKey.trim() && !this.state.serverAi) {
+      if (this.props.demoModus) return this.demoProposal(f);
+      this.setState({ view: 'enrich' });
+      return this.showToast('Geen server-koppeling — voeg je OpenAI API-sleutel toe');
+    }
+    this.setState({ busy: true, view: 'enrich', enrichPick: id });
+    // Voorkeursroute: live webverificatie via /api/search (Responses API + web_search).
+    if (this.state.serverAi) {
+      this.showToast('Webverificatie voor ' + f.naam + ' — het model zoekt live bronnen…');
+      try {
+        const r = await fetch('/api/search', { method: 'POST', headers: this.apiHeaders(), body: JSON.stringify({ financier: { naam: f.naam, website: f.website, adres: f.adres, type: f.type } }) });
+        const j = await r.json();
+        if (r.ok && j && j.profiel) {
+          const enrich = Object.assign({}, this.state.enrich, { [id]: { status: 'pending', proposal: j.profiel, model: (j.model || 'web') + ' + websearch', ts: new Date().toLocaleString('nl-NL'), demo: false, webVerified: !!j.webVerified } });
+          this.setState({ enrich, busy: false });
+          this.persist('cfp_enrich', enrich);
+          this.showToast(j.webVerified ? 'Webgeverifieerd voorstel klaar (' + (j.profiel.bronnen || []).length + ' bronnen) — controleer en keur goed' : 'Voorstel klaar — geen webbronnen gevonden, extra kritisch valideren');
+          return;
+        }
+        // 404 = /api/search niet gedeployed; anders fout tonen maar doorvallen op modelkennis.
+        if (r.status !== 404 && j && j.error) this.showToast('Webverificatie niet gelukt (' + j.error + ') — terugval op modelkennis');
+      } catch (e) {}
+    }
+    this.showToast('AI-voorstel genereren voor ' + f.naam + ' (modelkennis, zonder web)…');
+    const sys = 'Je bent een Nederlandse zakelijke-financieringsanalist. Geef ALLEEN publiek bekende, feitelijke informatie over de gevraagde financier. Gebruik null voor alles wat je niet zeker weet. Rentes ALTIJD als indicatieve bandbreedte met de toevoeging "(indicatief)". Antwoord uitsluitend met geldige JSON met exact deze sleutels: website, doelgroep, sectorFocus, vormen (array), minBedrag (getal in EUR of null), maxBedrag, rente, kosten, looptijd, aflossing, zekerheden (array), ltv, dscr, eigenInbreng, acceptatie, snelheid, documenten, bijzonderheden, bronnen (array met waarschijnlijke bron-URLs), betrouwbaarheid ("hoog"|"middel"|"laag"), opmerking. Wees conservatief: liever null dan gokken.';
+    const usr = 'Financier: ' + f.naam + ' (Nederland). Bekende context: type vermoedelijk ' + f.type + (f.website ? ', website mogelijk ' + f.website : '') + (f.adres ? ', adres ' + f.adres : '') + '. Geef het JSON-profiel.';
+    try {
+      const mod = await import('./lib/generate-report.js');
+      const prop = await mod.chatJson(b => this.aiChat(b), { model: this.model(), temperature: 0.2, messages: [{ role: 'system', content: sys }, { role: 'user', content: usr }] });
+      delete prop.__usage; delete prop.__model;
+      const enrich = Object.assign({}, this.state.enrich, { [id]: { status: 'pending', proposal: prop, model: this.model(), ts: new Date().toLocaleString('nl-NL'), demo: false, webVerified: false } });
+      this.setState({ enrich, busy: false });
+      this.persist('cfp_enrich', enrich);
+      this.showToast('Voorstel klaar — controleer en keur goed');
+    } catch (e) {
+      this.setState({ busy: false });
+      this.showToast('Mislukt: ' + e.message);
+    }
+  }
+  demoProposal(f) {
+    const prop = { website: f.website, doelgroep: 'MKB', sectorFocus: null, vormen: f.vormen, minBedrag: 50000, maxBedrag: 2000000, rente: '6% – 9% (indicatief, DEMO)', kosten: 'Afsluitprovisie ca. 1–3% (indicatief)', looptijd: '3 – 84 maanden', aflossing: 'Lineair of annuïtair', zekerheden: ['Pandrecht', 'Persoonlijke borg'], ltv: null, dscr: null, eigenInbreng: null, acceptatie: 'Minimaal 1 jaar actief, positieve kasstroom', snelheid: 'Indicatie binnen enkele werkdagen', documenten: 'Jaarcijfers, bankafschriften, KvK', bijzonderheden: 'DEMO-voorstel zonder API — uitsluitend ter illustratie van de workflow', bronnen: [f.website || 'https://voorbeeld.nl'], betrouwbaarheid: 'laag', opmerking: 'Demo' };
+    const enrich = Object.assign({}, this.state.enrich, { [f.id]: { status: 'pending', proposal: prop, model: 'demo', ts: new Date().toLocaleString('nl-NL'), demo: true } });
+    this.setState({ enrich, view: 'enrich', enrichPick: f.id });
+    this.persist('cfp_enrich', enrich);
+    this.showToast('Demo-voorstel aangemaakt (geen echte data)');
+  }
+  approve(id) {
+    const e = this.state.enrich[id];
+    if (!e) return;
+    const p = e.proposal || {};
+    const o = {};
+    ['website','doelgroep','sectorFocus','rente','kosten','looptijd','aflossing','ltv','dscr','eigenInbreng','acceptatie','snelheid','documenten','bijzonderheden','minBedrag','maxBedrag'].forEach(k => { if (p[k] != null && p[k] !== '') o[k] = p[k]; });
+    if (Array.isArray(p.vormen) && p.vormen.length) { o.vormen = p.vormen; o.vormenAanname = false; }
+    if (Array.isArray(p.zekerheden) && p.zekerheden.length) o.zekerheden = p.zekerheden;
+    if (Array.isArray(p.bronnen)) o.bronnen = p.bronnen;
+    if (e.docBased) {
+      o.betrouwbaarheid = 'hoog';
+      o.dataStatus = 'op basis van aangeleverde documenten (' + ((e.docNamen || []).join(', ') || 'financier') + ') + adviseur';
+      o.laatstGecontroleerd = new Date().toLocaleDateString('nl-NL') + ' (documenten + adviseur)';
+    } else if (e.webVerified) {
+      o.betrouwbaarheid = 'hoog';
+      o.dataStatus = 'geverifieerd via live webbronnen + adviseur';
+      o.laatstGecontroleerd = new Date().toLocaleDateString('nl-NL') + ' (websearch + adviseur)';
+    } else {
+      o.betrouwbaarheid = 'middel';
+      o.dataStatus = 'deels compleet — AI-modelkennis, gevalideerd door adviseur';
+      o.laatstGecontroleerd = new Date().toLocaleDateString('nl-NL') + ' (AI + adviseur)';
+    }
+    const overrides = Object.assign({}, this.state.overrides, { [id]: Object.assign({}, this.state.overrides[id] || {}, o) });
+    const enrich = Object.assign({}, this.state.enrich, { [id]: Object.assign({}, e, { status: 'approved' }) });
+    this.setState({ overrides, enrich });
+    this.persist('cfp_overrides', overrides);
+    this.persist('cfp_enrich', enrich);
+    this.showToast(e.docBased ? 'Toegepast — op basis van eigen documentatie, betrouwbaarheid: hoog' : e.webVerified ? 'Toegepast — webgeverifieerd, betrouwbaarheid: hoog' : 'Toegepast — betrouwbaarheid: middel (broncontrole aanbevolen)');
+  }
+  reject(id) {
+    const enrich = Object.assign({}, this.state.enrich, { [id]: Object.assign({}, this.state.enrich[id], { status: 'rejected' }) });
+    this.setState({ enrich });
+    this.persist('cfp_enrich', enrich);
+    this.showToast('Voorstel afgewezen');
+  }
+  // ---- Financiersdocumenten: uploaden en tot profieldata verwerken ----
+  async uploadFinDoc(e) {
+    const id = this.state.detailId;
+    const file = e.target.files && e.target.files[0];
+    e.target.value = '';
+    if (!id || !file) return;
+    if (file.size > 15 * 1024 * 1024) return this.showToast('Bestand te groot (max 15 MB)');
+    this.setState({ docBusy: true });
+    try {
+      const mod = await import('./lib/parse-file.js');
+      let text = await mod.extractText(file);
+      if (!text || text.length < 20) throw new Error('geen leesbare tekst gevonden (gescande PDF?)');
+      if (text.length > 25000) text = text.slice(0, 25000) + '\n[… ingekort tot 25.000 tekens]';
+      const list = (this.state.docs[id] || []).concat([{ naam: file.name, ts: new Date().toLocaleDateString('nl-NL'), tekst: text }]).slice(-8);
+      const docs = Object.assign({}, this.state.docs, { [id]: list });
+      this.setState({ docs, docBusy: false });
+      this.persist('cfp_docs', docs);
+      this.showToast('Document toegevoegd (' + list.length + ' totaal) — klik “Profiel bijwerken uit documenten”');
+    } catch (err) {
+      this.setState({ docBusy: false });
+      this.showToast('Lezen mislukt: ' + err.message);
+    }
+  }
+  delFinDoc(id, i) {
+    const list = (this.state.docs[id] || []).slice();
+    list.splice(i, 1);
+    const docs = Object.assign({}, this.state.docs, { [id]: list });
+    this.setState({ docs });
+    this.persist('cfp_docs', docs);
+  }
+  async enrichFromDocs(id) {
+    const f = this.merged().find(x => x.id === id);
+    const list = this.state.docs[id] || [];
+    if (!f || !list.length || this.state.busy) return;
+    if (!this.state.apiKey.trim() && !this.state.serverAi) { this.setState({ view: 'enrich' }); return this.showToast('Geen server-koppeling — voeg je OpenAI API-sleutel toe'); }
+    this.setState({ busy: true });
+    this.showToast('Profielvelden uit ' + list.length + ' document(en) van ' + f.naam + ' extraheren…');
+    const sys = 'Je bent een Nederlandse zakelijke-financieringsanalist. Je krijgt documenten die van de financier zelf afkomstig zijn (productsheets, voorwaarden, tarieven). Haal daar UITSLUITEND expliciet vermelde informatie uit — dit is een primaire bron, maar verzin niets erbij; gebruik null voor alles wat niet in de documenten staat. Rentes als bandbreedte met "(indicatief)" als het document geen vaste prijs noemt. Antwoord uitsluitend met geldige JSON met exact deze sleutels: website, doelgroep, sectorFocus, vormen (array), minBedrag (getal in EUR of null), maxBedrag, rente, kosten, looptijd, aflossing, zekerheden (array), ltv, dscr, eigenInbreng, acceptatie, snelheid, documenten, bijzonderheden, bronnen (array met de documentnamen), betrouwbaarheid ("hoog"|"middel"|"laag"), opmerking.';
+    const usr = 'Financier: ' + f.naam + ' (' + f.type + ')\n\nDOCUMENTEN:\n' + list.map(d => '=== ' + d.naam + ' (' + d.ts + ') ===\n' + d.tekst).join('\n\n').slice(0, 90000);
+    try {
+      const mod = await import('./lib/generate-report.js');
+      const prop = await mod.chatJson(b => this.aiChat(b), { model: this.model(), temperature: 0.1, max_tokens: 1400, messages: [{ role: 'system', content: sys }, { role: 'user', content: usr }] });
+      delete prop.__usage; delete prop.__model;
+      if (!Array.isArray(prop.bronnen) || !prop.bronnen.length) prop.bronnen = list.map(d => 'Document: ' + d.naam);
+      const enrich = Object.assign({}, this.state.enrich, { [id]: { status: 'pending', proposal: prop, model: this.model() + ' + documenten', ts: new Date().toLocaleString('nl-NL'), demo: false, docBased: true, docNamen: list.map(d => d.naam) } });
+      this.setState({ enrich, busy: false, view: 'enrich', enrichPick: id, detailId: null });
+      this.persist('cfp_enrich', enrich);
+      this.showToast('Documentvoorstel klaar — controleer en keur goed');
+    } catch (e) {
+      this.setState({ busy: false });
+      this.showToast('Mislukt: ' + e.message);
+    }
+  }
+  addNote() {
+    const id = this.state.detailId, t = this.state.noteDraft.trim();
+    if (!id || !t) return;
+    const list = (this.state.notes[id] || []).concat([{ text: t, date: new Date().toLocaleString('nl-NL') }]);
+    const notes = Object.assign({}, this.state.notes, { [id]: list });
+    this.setState({ notes, noteDraft: '' });
+    this.persist('cfp_notes', notes);
+  }
+  async runMatch() {
+    // Deterministische matching-engine (lib/match-engine.js) — inclusief feedback-loop
+    // op basis van vastgelegde uitkomsten uit eerdere casussen.
+    const eng = await import('./lib/match-engine.js');
+    const uitkomsten = eng.outcomesFromCases(this.state.cases);
+    const results = eng.matchFinanciers(this.merged(), this.state.mf, uitkomsten).slice(0, 8);
+    this.setState({ matchResults: results });
+  }
+  veldRows(f) {
+    const onb = '— onbekend, validatie nodig';
+    const mk = (k, v, opts) => ({ k, v: v == null || v === '' || (Array.isArray(v) && !v.length) ? onb : (Array.isArray(v) ? v.join(', ') : String(v)) + ((opts && opts.suffix) || ''), fg: v == null || v === '' || (Array.isArray(v) && !v.length) ? '#9AA1AC' : '#14202E', fs: v == null || v === '' || (Array.isArray(v) && !v.length) ? 'italic' : 'normal' });
+    return [
+      { titel: 'Profiel', velden: [
+        mk('Type', f.type + (f.typeAanname ? ' (aanname)' : '')),
+        mk('Financieringsvormen', f.vormen.join(', ') + (f.vormenAanname ? ' (aanname o.b.v. type)' : '')),
+        mk('Doelgroep', f.doelgroep), mk('Sectorfocus', f.sectorFocus),
+      ]},
+      { titel: 'Contact', velden: [
+        mk('Adres', f.adres), mk('Telefoon', f.telefoon), mk('E-mail', f.email), mk('KvK', f.kvk),
+        mk('Website', f.website ? f.website.replace('https://www.', '') + (f.websiteBron ? ' · ' + f.websiteBron.toLowerCase() : '') : null),
+      ]},
+      { titel: 'Voorwaarden', velden: [
+        mk('Indicatieve rente', f.rente), mk('Kosten', f.kosten),
+        mk('Bedrag', f.minBedrag != null || f.maxBedrag != null ? (this.fmtEur(f.minBedrag) || '?') + ' – ' + (this.fmtEur(f.maxBedrag) || '?') : null),
+        mk('Looptijd', f.looptijd), mk('Aflossing', f.aflossing), mk('Zekerheden', f.zekerheden),
+        mk('Max. LTV', f.ltv), mk('DSCR / ratio-eisen', f.dscr), mk('Eigen inbreng', f.eigenInbreng),
+      ]},
+      { titel: 'Acceptatie & proces', velden: [
+        mk('Acceptatiecriteria', f.acceptatie), mk('Snelheid beoordeling', f.snelheid),
+        mk('Vereiste documenten', f.documenten), mk('Bijzonderheden', f.bijzonderheden),
+      ]},
+      { titel: 'Bronnen', velden: f.bronnen.length ? f.bronnen.map((b, i) => mk('Bron ' + (i + 1), b)) : [mk('Bronnen', null)] },
+    ];
+  }
+  renderVals() {
+    const s = this.state;
+    const fs = this.merged();
+    const view = s.view;
+    const navKeys = { dashboard: 'dashboard', cases: 'cases', list: 'list', compare: 'compare', match: 'match', enrich: 'enrich' };
+    const navBg = {}, navFg = {};
+    Object.keys(navKeys).forEach(k => { navBg[k] = view === k ? '#1060FF' : 'transparent'; navFg[k] = view === k ? '#fff' : '#B9C4D6'; });
+    const q = s.search.trim().toLowerCase();
+    const isNonBank = f => f.type !== 'Bank';
+    const filtered = fs.filter(f => {
+      if (q && !((f.naam + ' ' + (f.adres || '') + ' ' + (f.email || '')).toLowerCase().includes(q))) return false;
+      if (s.fType && f.type !== s.fType) return false;
+      if (s.fVorm && !f.vormen.includes(s.fVorm)) return false;
+      if (s.fBank === 'bank' && isNonBank(f)) return false;
+      if (s.fBank === 'nonbank' && !isNonBank(f)) return false;
+      if (s.fLabel && !f.labels.includes(s.fLabel)) return false;
+      if (s.fData && this.statusOf(f)[2] !== s.fData) return false;
+      return true;
+    });
+    const rows = filtered.map(f => {
+      const [tFg, tBg] = this.typeColors(f.type);
+      const st = this.statusOf(f);
+      const inC = s.compare.includes(f.id);
+      return {
+        naam: f.naam, plaats: f.adres ? f.adres.split(',').pop().trim().replace(/^\d{4}\s?[A-Z]{2}\s*/, '') : '—',
+        type: f.type.replace(' / stichting', '').replace('maatschappij', ''), typeFg: tFg, typeBg: tBg,
+        vormenText: f.vormen.slice(0, 2).join(', ') + (f.vormen.length > 2 ? ' +' + (f.vormen.length - 2) : '') + (f.vormenAanname ? ' *' : ''),
+        renteText: f.rente ? f.rente : '—', renteFg: f.rente ? '#0A1B33' : '#C2C4BD',
+        isPP: f.labels.includes('Preferred Partner'), isEigendom: f.labels.includes('Eigendom'),
+        statusText: st[0], statusFg: st[1],
+        cbBg: inC ? '#1060FF' : '#fff', cbBorder: inC ? '#1060FF' : '#C9C7BE',
+        open: () => this.openDetail(f.id),
+        toggleCompare: e => { e.stopPropagation(); this.toggleCompare(f.id); },
+      };
+    });
+    const cnt = v => fs.filter(f => f.vormen.includes(v)).length;
+    const quickChips = [
+      ['Vastgoed', () => this.setState({ view: 'list', fVorm: 'Vastgoedfinanciering', fType: '', fBank: '' }), cnt('Vastgoedfinanciering')],
+      ['Werkkapitaal', () => this.setState({ view: 'list', fVorm: 'Werkkapitaal', fType: '', fBank: '' }), cnt('Werkkapitaal')],
+      ['Overnames', () => this.setState({ view: 'list', fVorm: 'Overnamefinanciering', fType: '', fBank: '' }), cnt('Overnamefinanciering')],
+      ['Leasing', () => this.setState({ view: 'list', fVorm: 'Leasing', fType: '', fBank: '' }), cnt('Leasing')],
+      ['Factoring', () => this.setState({ view: 'list', fVorm: 'Factoring', fType: '', fBank: '' }), cnt('Factoring')],
+      ['Rekening-courant', () => this.setState({ view: 'list', fVorm: 'Rekening-courant krediet', fType: '', fBank: '' }), cnt('Rekening-courant krediet')],
+      ['MKB-leningen', () => this.setState({ view: 'list', fVorm: 'MKB-lening', fType: '', fBank: '' }), cnt('MKB-lening')],
+      ['Banken', () => this.setState({ view: 'list', fType: 'Bank', fVorm: '', fBank: '' }), fs.filter(f => f.type === 'Bank').length],
+      ['Alternatieve financiers', () => this.setState({ view: 'list', fBank: 'nonbank', fType: '', fVorm: '' }), fs.filter(isNonBank).length],
+    ].map(([label, go, count]) => ({ label, go, count }));
+    const typeCounts = {};
+    fs.forEach(f => typeCounts[f.type] = (typeCounts[f.type] || 0) + 1);
+    const maxT = Math.max(1, ...Object.values(typeCounts));
+    const typeStats = Object.entries(typeCounts).sort((a, b) => b[1] - a[1]).map(([label, count]) => ({ label, count, pct: Math.round((count / maxT) * 100), go: () => this.setState({ view: 'list', fType: label, fVorm: '', fBank: '' }) }));
+    const pps = fs.filter(f => f.labels.includes('Preferred Partner'));
+    const detail = fs.find(f => f.id === s.detailId);
+    let d = { secties: [], notes: [], uitkomsten: [], docs: [] };
+    if (detail) {
+      const [tFg, tBg] = this.typeColors(detail.type);
+      const st = this.statusOf(detail);
+      d = {
+        naam: detail.naam, type: detail.type, typeFg: tFg, typeBg: tBg,
+        isPP: detail.labels.includes('Preferred Partner'),
+        statusText: st[0], statusFg: st[1],
+        secties: this.veldRows(detail),
+        notes: s.notes[detail.id] || [],
+        uitkomsten: s.cases.reduce((acc, c) => acc.concat((c.uitkomsten || []).filter(u => u.fid === detail.id).map(u => {
+          const kleur = u.resultaat === 'Gefinancierd' ? '#0E7A4C' : u.resultaat === 'Afgewezen' ? '#BE3E2B' : '#0B4EDC';
+          return { casus: c.klant, resultaat: u.resultaat, reden: u.reden || '—', ts: u.ts || '', fg: kleur };
+        })), []),
+        gecontroleerd: detail.laatstGecontroleerd,
+        betrouwbaarheid: detail.betrouwbaarheid,
+        betrFg: detail.betrouwbaarheid === 'hoog' ? '#0E7A4C' : detail.betrouwbaarheid === 'middel' ? '#0B4EDC' : '#9A5B0B',
+        enrich: () => { this.setState({ detailId: null }); this.enrichOne(detail.id); },
+        addCompare: () => this.toggleCompare(detail.id),
+        docs: (s.docs[detail.id] || []).map((doc, i) => ({ naam: doc.naam, ts: doc.ts, omvang: Math.round(doc.tekst.length / 1000) + 'k tekens', del: () => this.delFinDoc(detail.id, i) })),
+        enrichFromDocs: () => this.enrichFromDocs(detail.id),
+      };
+    }
+    const compareCards = s.compare.map(id => fs.find(f => f.id === id)).filter(Boolean).map(f => {
+      const [tFg, tBg] = this.typeColors(f.type);
+      const st = this.statusOf(f);
+      const toepassing = { 'Bank': 'Totaalpakket, scherpste pricing bij sterk profiel', 'Vastgoedfinancier': 'Verhuurd vastgoed en beleggingsportefeuilles', 'Factoringmaatschappij': 'Werkkapitaal uit debiteuren, snelle liquiditeit', 'Leasemaatschappij': 'Materieel en wagenpark zonder werkkapitaalbeslag', 'Crowdfundingplatform': 'Groei en marketingwaarde, flexibeler acceptatie', 'Non-bank lender': 'Snelheid en maatwerk waar de bank afhaakt', 'Investeerder / fonds': 'Risicodragend of achtergesteld kapitaal', 'Overheidsregeling / stichting': 'Starters en kleine tickets met borgstelling', 'Kredietkaart / betaaloplossing': 'Kortlopend werkkapitaal en betaalgemak' };
+      return {
+        naam: f.naam, type: f.type, typeFg: tFg, typeBg: tBg,
+        vormen: f.vormen.join(', ') + (f.vormenAanname ? ' (aanname)' : ''),
+        rente: f.rente || '— onbekend', renteFg: f.rente ? '#0A1B33' : '#9AA1AC',
+        bedrag: f.minBedrag != null || f.maxBedrag != null ? (this.fmtEur(f.minBedrag) || '?') + ' – ' + (this.fmtEur(f.maxBedrag) || '?') : '— onbekend',
+        looptijd: f.looptijd || '— onbekend', zekerheden: f.zekerheden.length ? f.zekerheden.join(', ') : '— onbekend',
+        kosten: f.kosten || '— onbekend', toepassing: toepassing[f.type] || '—',
+        aandacht: (f.betrouwbaarheid === 'laag' ? 'Data nog niet gevalideerd. ' : '') + (f.rente ? 'Rente indicatief — bron controleren.' : 'Voorwaarden opvragen bij financier.'),
+        status: st[0], statusFg: st[1],
+        remove: () => this.toggleCompare(f.id), open: () => this.openDetail(f.id),
+      };
+    });
+    const zekList = ['Hypotheekrecht', 'Pandrecht', 'Persoonlijke borg', 'Debiteuren', 'Voorraad', 'BMKB-borgstelling', 'Deels blanco'];
+    const zekChips = zekList.map(z => {
+      const on = s.mf.zek.includes(z);
+      return { label: z, bc: on ? '#1060FF' : '#D8D6CC', bg: on ? '#EAF0FF' : '#fff', fg: on ? '#0B4EDC' : '#48505C', toggle: () => { const zk = s.mf.zek.slice(); const i = zk.indexOf(z); i >= 0 ? zk.splice(i, 1) : zk.push(z); this.setState({ mf: Object.assign({}, s.mf, { zek: zk }) }); } };
+    });
+    const bedragN = this.num(s.mf.bedrag), waardeN = this.num(s.mf.waarde);
+    const matchCards = (s.matchResults || []).map((r, i) => {
+      const [tFg, tBg] = this.typeColors(r.f.type);
+      return {
+        rank: i + 1, naam: r.f.naam, type: r.f.type, typeFg: tFg, typeBg: tBg,
+        score: r.score, scoreFg: r.score >= 75 ? '#0E7A4C' : r.score >= 55 ? '#0B4EDC' : '#9A5B0B',
+        redenen: r.redenen.length ? r.redenen.map(x => '• ' + x).join('  ') : '• voldoet aan het gevraagde producttype',
+        aandacht: r.aandacht.length ? r.aandacht.map(x => '• ' + x).join('  ') : '• geen bijzonderheden bekend',
+        open: () => this.openDetail(r.f.id), addCompare: () => this.toggleCompare(r.f.id),
+      };
+    });
+    const enrichEntries = Object.entries(s.enrich).filter(([, e]) => e.status !== 'rejected').sort((a, b) => (b[1].ts || '').localeCompare(a[1].ts || ''));
+    const enrichCards = enrichEntries.map(([id, e]) => {
+      const f = fs.find(x => x.id === id);
+      if (!f) return null;
+      const p = e.proposal || {};
+      const chip = e.status === 'approved' ? ['Goedgekeurd', '#0E7A4C', '#E4F3EB', '#CBE7D8'] : ['AI-voorstel — te valideren', '#9A5B0B', '#F9EFDD', '#EAD9B8'];
+      const val = v => v == null || v === '' || (Array.isArray(v) && !v.length) ? '—' : (Array.isArray(v) ? v.join(', ') : String(v));
+      return {
+        naam: f.naam, chip: chip[0], chipFg: chip[1], chipBg: chip[2], border: e.status === 'approved' ? '#CBE7D8' : '#EAD9B8',
+        meta: (e.demo ? 'demo · ' : 'model ' + e.model + ' · ') + (e.ts || ''),
+        velden: [
+          { k: 'Rente', v: val(p.rente) }, { k: 'Bedrag', v: p.minBedrag != null || p.maxBedrag != null ? val(this.fmtEur(p.minBedrag)) + ' – ' + val(this.fmtEur(p.maxBedrag)) : '—' },
+          { k: 'Vormen', v: val(p.vormen) }, { k: 'Looptijd', v: val(p.looptijd) },
+          { k: 'Zekerheden', v: val(p.zekerheden) }, { k: 'Kosten', v: val(p.kosten) },
+          { k: 'Doelgroep', v: val(p.doelgroep) }, { k: 'Acceptatie', v: val(p.acceptatie) },
+          { k: 'Snelheid', v: val(p.snelheid) }, { k: 'Bijzonderheden', v: val(p.bijzonderheden) },
+        ],
+        hasBronnen: Array.isArray(p.bronnen) && p.bronnen.length > 0,
+        bronnen: (p.bronnen || []).join(' · '),
+        pending: e.status === 'pending',
+        approve: () => this.approve(id), reject: () => this.reject(id),
+      };
+    }).filter(Boolean);
+    const noEnrich = fs.filter(f => !s.enrich[f.id]);
+    const enrichOptions = (noEnrich.length ? noEnrich : fs).map(f => ({ id: f.id, naam: f.naam + (s.enrich[f.id] ? ' (al verrijkt)' : '') }));
+    const pick = s.enrichPick || (enrichOptions[0] && enrichOptions[0].id) || '';
+    const stColors = { 'Intake': ['#0B4EDC', '#EAF0FF'], 'Uitgezet bij financiers': ['#9A5B0B', '#F9EFDD'], 'Offerte ontvangen': ['#7C3AED', '#F1EAFB'], 'Gesloten': ['#0E7A4C', '#E4F3EB'], 'Niet doorgegaan': ['#67707E', '#EFEEE8'] };
+    const cc = this.currentCase();
+    const rep = cc ? cc.report : null;
+    const caseCards = s.cases.map(c => {
+      const sc = stColors[c.status] || stColors['Intake'];
+      return { klant: c.klant, titel: c.titel || c.vorm || '—', status: c.status, stFg: sc[0], stBg: sc[1], preview: c.tekst, bedrag: c.bedrag ? '€ ' + c.bedrag : '—', vorm: c.vorm || '', repText: c.report ? 'Rapport gereed' : 'Nog geen rapport', repFg: c.report ? '#0E7A4C' : '#9AA1AC', open: () => this.setState({ view: 'cases', caseId: c.id }) };
+    });
+    const recentCases = s.cases.slice(0, 5).map(c => { const sc = stColors[c.status] || stColors['Intake']; return { klant: c.klant, titel: c.titel || c.vorm || '—', status: c.status, stFg: sc[0], stBg: sc[1], repFg: c.report ? '#0E7A4C' : '#9AA1AC', repText: c.report ? 'rapport' : 'geen rapport', open: () => this.setState({ view: 'cases', caseId: c.id }) }; });
+    const titles = {
+      dashboard: ['Dashboard', 'Overzicht van het financiersnetwerk en de datakwaliteit'],
+      cases: ['Casussen', s.cases.length + ' casussen · van intake tot AI-rapport en deal'],
+      list: ['Financiersdatabase', filtered.length + ' van ' + fs.length + ' financiers · * = aanname op basis van naam'],
+      compare: ['Vergelijken', 'Zet maximaal vier financiers naast elkaar'],
+      match: ['Matching', 'Van financieringsvraag naar indicatieve shortlist'],
+      enrich: ['AI-verrijking & validatie', 'Publieke data ophalen, controleren en goedkeuren'],
+    };
+    const kpiValid = fs.filter(f => this.statusOf(f)[2] === 'valid').length;
+    const kpiAi = fs.filter(f => this.statusOf(f)[2] === 'ai').length;
+    const qL = fs.filter(f => f.betrouwbaarheid === 'laag').length, qM = fs.filter(f => f.betrouwbaarheid === 'middel').length, qH = fs.filter(f => f.betrouwbaarheid === 'hoog').length;
+    const tot = Math.max(1, fs.length), RC = 351.86;
+    const openCases = s.cases.filter(c => c.status !== 'Gesloten' && c.status !== 'Niet doorgegaan').length;
+    return {
+      navBg, navFg, totaal: fs.length, compareCount: s.compare.length, enrichCount: enrichEntries.length,
+      viewTitle: titles[view][0], viewSub: titles[view][1],
+      headerOn: view !== 'dashboard',
+      greeting: (h => h < 6 ? 'Goedenavond.' : h < 12 ? 'Goedemorgen.' : h < 18 ? 'Goedemiddag.' : 'Goedenavond.')(new Date().getHours()),
+      datumLabel: new Date().toLocaleDateString('nl-NL', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }),
+      isDash: view === 'dashboard', isList: view === 'list', isCompare: view === 'compare', isMatch: view === 'match', isEnrich: view === 'enrich',
+      goDash: () => this.setView('dashboard'), goList: () => this.setView('list'), goCompare: () => this.setView('compare'), goMatch: () => this.setView('match'), goEnrich: () => this.setView('enrich'),
+      apiDotColor: s.serverAi ? '#3DDC84' : s.apiKey ? (s.keyOk === false ? '#E0A03C' : '#3DDC84') : '#5F7392',
+      apiStatusLabel: (s.serverAi ? 'Server-koppeling actief' : s.apiKey ? 'OpenAI gekoppeld (lokaal)' : 'Geen API-koppeling') + (s.storeOn ? ' · gedeelde opslag' : ''),
+      kpiRente: fs.filter(f => f.rente).length, kpiValid, kpiTodo: fs.length - kpiValid - kpiAi,
+      quickChips, typeStats,
+      qLaag: qL, qMiddel: qM, qHoog: qH, openCases,
+      pctData: Math.round(((qM + qH) / tot) * 100) + '%',
+      ringHoog: (qH / tot * RC).toFixed(1) + ' ' + RC,
+      ringMiddel: (qM / tot * RC).toFixed(1) + ' ' + RC,
+      ringMiddelOff: (-(qH / tot) * RC).toFixed(1),
+      ringLaag: (qL / tot * RC).toFixed(1) + ' ' + RC,
+      ringLaagOff: (-((qH + qM) / tot) * RC).toFixed(1),
+      ppCount: pps.length, ppChips: pps.map(f => ({ naam: f.naam, open: () => this.openDetail(f.id) })),
+      search: s.search, onSearch: e => this.setState({ search: e.target.value }),
+      fType: s.fType, onFType: e => this.setState({ fType: e.target.value }),
+      fVorm: s.fVorm, onFVorm: e => this.setState({ fVorm: e.target.value }),
+      fBank: s.fBank, onFBank: e => this.setState({ fBank: e.target.value }),
+      fLabel: s.fLabel, onFLabel: e => this.setState({ fLabel: e.target.value }),
+      fData: s.fData, onFData: e => this.setState({ fData: e.target.value }),
+      resetFilters: () => this.setState({ search: '', fType: '', fVorm: '', fBank: '', fLabel: '', fData: '' }),
+      resultLabel: filtered.length + ' financiers · klik een rij voor het volledige profiel, vink aan om te vergelijken',
+      rows, emptyList: filtered.length === 0, rowPad: (this.props.dichtheid ?? 'comfortabel') === 'compact' ? '7px' : '12px',
+      compareEmpty: compareCards.length === 0, compareCols: Math.max(1, compareCards.length), compareCards,
+      mfVorm: s.mf.vorm, onMfVorm: e => this.setState({ mf: Object.assign({}, s.mf, { vorm: e.target.value }) }),
+      mfBedrag: s.mf.bedrag, onMfBedrag: e => this.setState({ mf: Object.assign({}, s.mf, { bedrag: e.target.value }) }),
+      mfLooptijd: s.mf.looptijd, onMfLooptijd: e => this.setState({ mf: Object.assign({}, s.mf, { looptijd: e.target.value }) }),
+      mfDoel: s.mf.doel, onMfDoel: e => this.setState({ mf: Object.assign({}, s.mf, { doel: e.target.value }) }),
+      mfOmzet: s.mf.omzet, onMfOmzet: e => this.setState({ mf: Object.assign({}, s.mf, { omzet: e.target.value }) }),
+      mfEbitda: s.mf.ebitda, onMfEbitda: e => this.setState({ mf: Object.assign({}, s.mf, { ebitda: e.target.value }) }),
+      mfWaarde: s.mf.waarde, onMfWaarde: e => this.setState({ mf: Object.assign({}, s.mf, { waarde: e.target.value }) }),
+      mfSnelheid: s.mf.snelheid, onMfSnelheid: e => this.setState({ mf: Object.assign({}, s.mf, { snelheid: e.target.value }) }),
+      mfRisico: s.mf.risico, onMfRisico: e => this.setState({ mf: Object.assign({}, s.mf, { risico: e.target.value }) }),
+      mfLtv: bedragN && waardeN ? Math.round((bedragN / waardeN) * 100) + '%' : '—',
+      zekChips, runMatch: () => this.runMatch(),
+      matchIdle: !s.matchResults, matchCards,
+      isCases: view === 'cases', goCases: () => this.setState({ view: 'cases', caseId: null }),
+      casesCount: s.cases.length, casesEmpty: s.cases.length === 0,
+      caseListOn: !cc, caseOpen: !!cc, caseCards, recentCases,
+      caseModalOn: s.caseModal,
+      openCaseModal: () => this.setState({ caseModal: true }),
+      closeCaseModal: () => this.setState({ caseModal: false }),
+      cfKlant: s.cf.klant, onCfKlant: e => this.setState({ cf: Object.assign({}, s.cf, { klant: e.target.value }) }),
+      cfTitel: s.cf.titel, onCfTitel: e => this.setState({ cf: Object.assign({}, s.cf, { titel: e.target.value }) }),
+      cfBedrag: s.cf.bedrag, onCfBedrag: e => this.setState({ cf: Object.assign({}, s.cf, { bedrag: e.target.value }) }),
+      cfVorm: s.cf.vorm, onCfVorm: e => this.setState({ cf: Object.assign({}, s.cf, { vorm: e.target.value }) }),
+      cfTekst: s.cf.tekst, onCfTekst: e => this.setState({ cf: Object.assign({}, s.cf, { tekst: e.target.value }) }),
+      saveCase: () => this.saveCase(),
+      ccKlant: cc ? cc.klant : '',
+      ccMeta: cc ? [cc.titel, cc.vorm, cc.bedrag ? '€ ' + cc.bedrag : null, cc.created ? 'aangemaakt ' + cc.created : null].filter(Boolean).join(' · ') : '',
+      ccStatus: cc ? cc.status : 'Intake', onCcStatus: e => cc && this.updateCase(cc.id, { status: e.target.value }),
+      ccTekst: cc ? cc.tekst : '', onCcTekst: e => cc && this.updateCase(cc.id, { tekst: e.target.value }),
+      delCase: () => cc && this.deleteCase(cc.id),
+      backToCases: () => this.setState({ caseId: null }),
+      printReport: () => this.printReport(),
+      exportBackup: () => this.exportBackup(), importBackup: e => this.importBackup(e),
+      genReport: () => this.genReport(),
+      reportBtnLabel: s.reportBusy ? (s.reportStep || 'Casus wordt beoordeeld…') : rep ? 'Genereer rapport opnieuw' : 'Genereer AI-rapport',
+      reportHint: s.serverAi ? 'Pre-filter selecteert eerst de kansrijkste van de ' + fs.length + ' financiers; de AI beoordeelt die diepgaand (server-koppeling).' : s.apiKey ? 'Pre-filter + AI-beoordeling via je OpenAI-koppeling.' : 'Stel eerst een API-sleutel in onder AI-verrijking (of deploy met OPENAI_API_KEY).',
+      kfBtnLabel: s.kfBusy ? 'Kengetallen extraheren…' : (cc && cc.kengetallen ? 'Kengetallen herberekenen' : 'Analyseer kengetallen'),
+      analyseKengetallen: () => this.analyseKengetallen(false),
+      hasKengetallen: !!(cc && cc.kengetallen && (cc.kengetallen.velden || []).length),
+      kernVelden: cc && cc.kengetallen ? (cc.kengetallen.velden || []) : [],
+      kernToelichting: cc && cc.kengetallen ? (cc.kengetallen.toelichting || '') : '',
+      kernHasToelichting: !!(cc && cc.kengetallen && cc.kengetallen.toelichting),
+      kernMeta: cc && cc.kengetallen ? 'geëxtraheerd ' + (cc.kengetallen.ts || '') + ' · LTV/DSCR/schuld-EBITDA in code berekend' : '',
+      exportWord: () => this.exportWord(),
+      allFinOptions: [{ id: '', naam: '— kies financier —' }].concat(fs.slice().sort((a, b) => a.naam.localeCompare(b.naam)).map(f => ({ id: f.id, naam: f.naam }))),
+      ufFid: s.uf.fid, onUfFid: e => this.setState({ uf: Object.assign({}, s.uf, { fid: e.target.value }) }),
+      ufResultaat: s.uf.resultaat, onUfResultaat: e => this.setState({ uf: Object.assign({}, s.uf, { resultaat: e.target.value }) }),
+      ufReden: s.uf.reden, onUfReden: e => this.setState({ uf: Object.assign({}, s.uf, { reden: e.target.value }) }),
+      addUitkomst: () => this.addUitkomst(),
+      uitkomstCards: (cc ? cc.uitkomsten || [] : []).map((u, i) => {
+        const f = fs.find(x => x.id === u.fid) || { naam: u.fid };
+        const kleur = u.resultaat === 'Gefinancierd' ? ['#0E7A4C', '#E4F3EB'] : u.resultaat === 'Afgewezen' ? ['#BE3E2B', '#FBEAE6'] : ['#0B4EDC', '#EAF0FF'];
+        return { naam: f.naam, resultaat: u.resultaat, reden: u.reden || '—', ts: u.ts || '', fg: kleur[0], bg: kleur[1], del: () => this.delUitkomst(i) };
+      }),
+      hasUitkomsten: !!(cc && (cc.uitkomsten || []).length),
+      hasReport: !!rep,
+      repMeta: rep ? 'model ' + (rep._meta || {}).model + ' · ' + (rep._meta || {}).ts : '',
+      repSamenvatting: rep ? rep.samenvatting : '',
+      repGevraagd: rep && rep.casusAnalyse ? [rep.casusAnalyse.gevraagd, rep.casusAnalyse.doel].filter(Boolean).join(' — ') : '',
+      repRatios: rep && rep.casusAnalyse && rep.casusAnalyse.ratios ? rep.casusAnalyse.ratios : '',
+      repSterktes: rep && rep.casusAnalyse ? (rep.casusAnalyse.sterktes || []).map(x => '• ' + x).join('  ') : '',
+      repRisicos: rep && rep.casusAnalyse ? (rep.casusAnalyse.risicos || []).map(x => '• ' + x).join('  ') : '',
+      repHasProfiel: !!(rep && rep.casusAnalyse && rep.casusAnalyse.ondernemingsprofiel),
+      repProfiel: rep && rep.casusAnalyse ? [rep.casusAnalyse.ondernemingsprofiel, rep.casusAnalyse.zekerhedenpositie].filter(Boolean).join(' ') : '',
+      repHasKern: !!(rep && rep.casusAnalyse && (rep.casusAnalyse.kerngegevens || []).length),
+      repKern: rep && rep.casusAnalyse ? (rep.casusAnalyse.kerngegevens || []).map(k => ({ label: k.label, waarde: k.waarde })) : [],
+      repHasAfvallers: !!(rep && (rep.afvallers || []).length),
+      repAfvallers: (rep ? rep.afvallers || [] : []).map(a => ({ naam: (fs.find(x => x.id === a.id) || { naam: a.id }).naam, reden: a.reden })),
+      repHasTips: !!(rep && (rep.onderhandelingstips || []).length),
+      repTips: rep ? (rep.onderhandelingstips || []).map(x => '• ' + x).join('  ') : '',
+      uploadModalFile: e => this.uploadCasus(e, 'modal'),
+      uploadCaseFile: e => this.uploadCasus(e, 'case'),
+      uploadLabel: s.uploadBusy ? 'Document wordt gelezen…' : 'Upload document',
+      repCards: (rep ? rep.shortlist || [] : []).map((m, i) => {
+        const f = fs.find(x => x.id === m.id) || { naam: m.id, type: '', id: null };
+        const [tFg, tBg] = this.typeColors(f.type);
+        const kc = m.kans === 'hoog' ? ['#0E7A4C', '#E4F3EB'] : m.kans === 'middel' ? ['#0B4EDC', '#EAF0FF'] : ['#9A5B0B', '#F9EFDD'];
+        return {
+          rank: i + 1, naam: f.naam, type: f.type || '—', typeFg: tFg, typeBg: tBg,
+          kans: m.kans, kansFg: kc[0], kansBg: kc[1], score: Math.round(m.score || 0),
+          motivatie: m.motivatie || '—', aandacht: m.aandachtspunten || '—',
+          structuur: m.indicatieveStructuur || '—',
+          detail: [['Rente-indicatie', m.renteIndicatie], ['Voorwaarden', m.verwachteVoorwaarden], ['Doorlooptijd', m.doorlooptijd], ['Documenten', m.benodigdeDocumenten]].filter(x => x[1]).map(x => ({ k: x[0], v: x[1] })),
+          hasDetail: !!(m.renteIndicatie || m.verwachteVoorwaarden || m.doorlooptijd || m.benodigdeDocumenten),
+          open: () => f.id && this.openDetail(f.id),
+          addCompare: () => f.id && this.toggleCompare(f.id),
+        };
+      }),
+      repHasRoutes: !!(rep && (rep.alternatieveRoutes || []).length),
+      repRoutes: rep ? (rep.alternatieveRoutes || []).map(x => '• ' + x).join('  ') : '',
+      repStappen: rep ? (rep.vervolgstappen || []).map((x, i) => (i + 1) + '. ' + x).join('  ') : '',
+      repDisclaimer: rep ? rep.disclaimer || '' : '',
+      apiKey: s.apiKey, onApiKey: e => this.setState({ apiKey: e.target.value }),
+      appToken: s.appToken, onAppToken: e => this.setState({ appToken: e.target.value }),
+      saveKey: () => this.saveKey(), testKey: () => this.testKey(),
+      keyStatus: s.keyStatus || (s.apiKey ? 'Sleutel aanwezig — nog niet getest.' : 'Nog geen sleutel ingesteld.'),
+      keyStatusColor: s.keyOk === true ? '#3DDC84' : s.keyOk === false ? '#F0A860' : '#7C8DA8',
+      modelLabel: this.model(),
+      enrichOptions, enrichPick: pick, onEnrichPick: e => this.setState({ enrichPick: e.target.value }),
+      enrichNow: () => this.enrichOne(pick), enrichBtnLabel: s.busy ? 'Bezig…' : 'Genereer voorstel',
+      enrichCards, enrichEmpty: enrichCards.length === 0,
+      detailOn: !!detail, d, dHasUitkomsten: d.uitkomsten.length > 0, dHasDocs: d.docs.length > 0, closeDetail: () => this.setState({ detailId: null }),
+      uploadFinDoc: e => this.uploadFinDoc(e),
+      uploadDocLabel: s.docBusy ? 'Document wordt gelezen…' : 'Upload document (PDF, Word, tekst)',
+      docExtractLabel: s.busy ? 'Bezig…' : 'Profiel bijwerken uit documenten',
+      noteDraft: s.noteDraft, onNoteDraft: e => this.setState({ noteDraft: e.target.value }), addNote: () => this.addNote(),
+      trayOn: s.compare.length > 0 && view !== 'compare',
+      trayLabel: s.compare.length + ' geselecteerd',
+      trayNames: s.compare.map(id => (fs.find(f => f.id === id) || {}).naam).filter(Boolean).join(' · '),
+      clearCompare: () => this.setState({ compare: [] }),
+      toastOn: !!s.toast, toast: s.toast,
+      exportCsv: () => this.exportCsv(),
+    };
+  }
+}
+</script>
+</body>
+</html>
